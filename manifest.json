@@ -1,0 +1,24 @@
+{
+  "name": "3학년부 일정(영생)",
+  "short_name": "영생 3학년부",
+  "description": "영생고등학교 3학년부 학사일정",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f0efea",
+  "theme_color": "#185FA5",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
