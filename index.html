@@ -1,0 +1,3489 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3학년부 일정(영생)</title>
+<link rel="manifest" href="manifest.json">
+<!-- Google Fonts: preconnect 방식으로 렌더 블로킹 방지 -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<link rel="icon" href="icon-192.png" type="image/png">
+<meta name="theme-color" content="#185FA5">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="영생 3학년부">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --color-g3-bg:#d6eaf8; --color-g3-item:#E6F1FB; --color-g3-text:#0C447C;
+    --color-school-bg:#eeede7; --color-school-item:#E8E6DF; --color-school-text:#444;
+    --color-exam-bg:#FAECE7; --color-exam-text:#712B13;
+    --color-holiday-bg:#FCEBEB; --color-holiday-text:#A32D2D;
+    --color-sun-bg:#fff5f5; --color-sat-bg:#f4f7ff;
+    --color-dow-sun:#c0392b; --color-dow-sat:#1a5fa8;
+    --color-today-border:#E24B4A; --color-today-num:#185FA5;
+  }
+
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: #f0efea;
+    color: #1a1a1a;
+  }
+
+  /* ── 페이지 전체 래퍼 ── */
+  .page-wrap {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 1.2rem 1.2rem 3rem;
+  }
+
+  /* ── 최상단 헤더 ── */
+  .top-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .top-header h1 { font-size: 22px; font-weight: 700; }
+  .status-bar {
+    display: flex; align-items: center; gap: 7px;
+    font-size: 12px; color: #888;
+  }
+  .status-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: #EF9F27; flex-shrink: 0; transition: background 0.3s;
+  }
+  .status-dot.ok  { background: #639922; }
+  .status-dot.err { background: #E24B4A; }
+  .refresh-btn {
+    background: #fff; border: 1px solid #ddd; border-radius: 6px;
+    padding: 4px 10px; font-size: 12px;
+    font-family: 'Noto Sans KR', sans-serif; color: #555; cursor: pointer;
+  }
+  .refresh-btn:hover { background: #d5d3cc; }
+
+  /* ── 상단 3칸 패널 ── */
+  .top-panels {
+    display: grid;
+    grid-template-columns: 1fr 1.4fr 1fr;
+    gap: 12px;
+    margin-bottom: 1rem;
+  }
+  .panel {
+    background: #fff;
+    border: 1px solid #e0deda;
+    border-radius: 12px;
+    padding: 14px 16px;
+    min-height: 180px;
+    max-height: 280px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+  .panel-title {
+    font-size: 13px; font-weight: 700; color: #444;
+    margin-bottom: 10px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: space-between; gap: 6px;
+    position: sticky; top: -14px;
+    background: #fff;
+    padding: 14px 0 8px;
+    margin-top: -14px;
+    border-bottom: 1px solid #f0efeb;
+    z-index: 1;
+  }
+  .panel-title-left { display: flex; align-items: center; gap: 6px; }
+  .panel-edit-btn {
+    background: none; border: 1px solid #ddd; border-radius: 6px;
+    padding: 2px 8px; font-size: 11px;
+    font-family: 'Noto Sans KR', sans-serif; color: #888; cursor: pointer;
+    flex-shrink: 0;
+  }
+  .panel-edit-btn:hover { background: #f0efeb; color: #333; }
+
+  /* 링크 패널 — 2열 그리드 */
+  .link-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+  .link-item {
+    display: block;
+    background: #E6F1FB;
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #0C447C;
+    text-decoration: none;
+    text-align: center;
+    word-break: keep-all;
+    line-height: 1.4;
+    transition: background 0.15s;
+  }
+  .link-item:hover { background: #B5D4F4; }
+
+  /* 공지 패널 */
+  .notice-item {
+    border-bottom: 1px solid #f0efeb;
+    overflow: hidden;
+  }
+  .notice-item:last-child { border-bottom: none; }
+  .notice-title-row {
+    display: flex; align-items: center; gap: 6px;
+    padding: 8px 4px;
+    cursor: pointer;
+    font-size: 13px; font-weight: 500; color: #1a1a1a;
+    transition: background 0.1s;
+    user-select: none;
+  }
+  .notice-title-row:hover { background: #f5f4f0; border-radius: 6px; }
+  .notice-dot {
+    width: 5px; height: 5px; border-radius: 50%;
+    background: #185FA5; flex-shrink: 0;
+  }
+  .notice-title-text { flex: 1; }
+  .notice-arrow { font-size: 10px; color: #aaa; transition: transform 0.2s; flex-shrink: 0; }
+  .notice-item.open .notice-arrow { transform: rotate(180deg); }
+  .notice-body {
+    display: none;
+    padding: 0 4px 10px 16px;
+    font-size: 12px; color: #555; line-height: 1.7;
+    white-space: pre-line;
+  }
+  .notice-item.open .notice-body { display: block; }
+  .notice-empty { font-size: 12px; color: #aaa; }
+
+  /* 3학년부 요약 패널 */
+  .summary-item {
+    padding: 7px 0;
+    border-bottom: 1px solid #f0efeb;
+    cursor: pointer;
+  }
+  .summary-item:last-child { border-bottom: none; }
+  .summary-item:hover { background: #f5f4f0; border-radius: 6px; padding: 7px 6px; margin: 0 -6px; }
+  .summary-date {
+    font-size: 12px; font-weight: 700; color: #555; margin-bottom: 2px;
+  }
+  .summary-text { font-size: 12px; color: #0C447C; line-height: 1.4; }
+  .summary-empty { font-size: 12px; color: #aaa; }
+
+  /* ── 달력 컨트롤 바 (고정될 영역) ── */
+  .cal-sticky {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: #f0efea;
+    padding: 8px 0 0;
+  }
+  /* 컨트롤 바 래퍼: 컴팩트 모드 시 달력과 같은 너비·위치로 좁아짐 */
+  #cal-controls-wrap {
+    max-width: 100%;
+    margin: 0 auto;
+    transition: max-width 0.2s;
+  }
+  .cal-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding: 7px 12px;
+    background: #fff;
+    border: 1px solid #e0deda;
+    border-bottom: none;
+    margin-bottom: 0;
+  }
+  .cal-controls-row1 {
+    border-radius: 10px 10px 0 0;
+    border-bottom: 1px solid #f0efeb;
+  }
+  .cal-controls-row2 {
+    border-radius: 0;
+    border-top: none;
+    border-bottom: none;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    justify-content: space-between;
+  }
+  .ctrl-group { display: flex; align-items: center; gap: 4px; }
+  .ctrl-divider { width: 1px; height: 20px; background: #e0deda; margin: 0 4px; }
+
+  .zoom-btn {
+    background: #f5f4f0; border: 1px solid #ddd; border-radius: 6px;
+    padding: 4px 10px; font-size: 12px;
+    font-family: 'Noto Sans KR', sans-serif; color: #333; cursor: pointer;
+  }
+  .zoom-btn:hover { background: #e8e6e0; }
+  .zoom-value { font-size: 12px; font-weight: 700; color: #185FA5; min-width: 36px; text-align: center; }
+
+  .search-input {
+    width: 180px; padding: 5px 10px;
+    border: 1.5px solid #ddd; border-radius: 8px;
+    font-size: 13px; font-family: 'Noto Sans KR', sans-serif;
+    color: #1a1a1a; outline: none;
+  }
+  .search-input:focus { border-color: #185FA5; }
+  .search-clear {
+    padding: 5px 8px; border: 1px solid #ddd; border-radius: 6px;
+    background: #fff; font-size: 12px; color: #888; cursor: pointer; display: none;
+  }
+  .search-clear.visible { display: block; }
+  .search-nav { display: none; align-items: center; gap: 4px; }
+  .search-nav.visible { display: flex; }
+  .search-nav-btn {
+    background: #fff; border: 1px solid #ddd; border-radius: 6px;
+    padding: 3px 8px; font-size: 12px; cursor: pointer; color: #333;
+  }
+  .search-nav-btn:hover { background: #f0efeb; }
+  .search-nav-info { font-size: 12px; color: #185FA5; font-weight: 700; min-width: 36px; text-align: center; }
+
+  .ctrl-btn {
+    background: #fff; border: 1px solid #ccc; border-radius: 6px;
+    padding: 4px 10px; font-size: 12px;
+    font-family: 'Noto Sans KR', sans-serif; color: #444; cursor: pointer;
+  }
+  .ctrl-btn:hover { background: #f0efeb; }
+  .ctrl-btn.g3 { background: #0F6E56; color: #fff; border-color: #0F6E56; }
+  .ctrl-btn.g3:hover { background: #085041; }
+  .ctrl-spacer { flex: 1; }
+  .view-tab-btn {
+    background: #f5f4f0; border: 1px solid #ddd; border-radius: 6px;
+    padding: 4px 10px; font-size: 12px;
+    font-family: 'Noto Sans KR', sans-serif; color: #555; cursor: pointer;
+    transition: all 0.15s;
+  }
+  .view-tab-btn:hover { background: #e8e6e0; }
+  .view-tab-btn.active { background: #185FA5; color: #fff; border-color: #185FA5; }
+
+  /* 월+요일 고정 헤더 */
+  #cal-zoom-wrap-header {
+    overflow: hidden;
+  }
+  .sticky-month-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 6px 12px;
+    background: #fff;
+    border-left: 1px solid #e0deda;
+    border-right: 1px solid #e0deda;
+  }
+  .sticky-month-label { font-size: 1em; font-weight: 700; color: #1a1a1a; }
+  .sticky-dow-row {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 2px;
+    padding: 0 0 4px;
+    border-left: 1px solid #e0deda;
+    border-right: 1px solid #e0deda;
+    border-bottom: 1px solid #e0deda;
+    border-radius: 0 0 0 0;
+    background: #fff;
+  }
+  .sticky-dow-cell {
+    text-align: center; font-size: 0.8125em; font-weight: 700;
+    color: #fff; padding: 5px 0; background: #555; border-radius: 4px;
+  }
+  .sticky-dow-cell.sun { background: var(--color-dow-sun); }
+  .sticky-dow-cell.sat { background: var(--color-dow-sat); }
+
+  /* 검색 결과 바 */
+  .search-result-bar {
+    font-size: 12px; color: #185FA5; padding: 4px 12px;
+    background: #fff;
+    border-left: 1px solid #e0deda; border-right: 1px solid #e0deda;
+    display: none;
+  }
+  .search-result-bar.visible { display: block; }
+
+  /* ── 달력 영역 ── */
+  .cal-body {
+    background: #e8e6e0;
+    border: 1px solid #e0deda;
+    border-top: none;
+    border-radius: 0 0 12px 12px;
+    padding: 8px 8px 12px;
+  }
+
+  /* 월 블록 */
+  .month-block { margin-bottom: 2rem; }
+  .month-title { font-size: 1.125em; font-weight: 700; color: #1a1a1a; padding: 8px 4px 6px; }
+
+  .dow-row { display: none; }
+  .dow-cell {
+    text-align: center; font-size: 14px; font-weight: 700;
+    color: #fff; padding: 7px 0; background: #555; border-radius: 4px;
+  }
+  .dow-cell.sun { background: var(--color-dow-sun); }
+  .dow-cell.sat { background: var(--color-dow-sat); }
+
+  .cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 2px;
+  }
+  .day-cell {
+    border: 1px solid #e8e6e0; border-radius: 6px;
+    min-height: 80px; padding: 5px; background: #fff;
+    cursor: pointer; display: flex; flex-direction: column;
+    gap: 3px; transition: border-color 0.15s, opacity 0.15s;
+  }
+  .day-cell:hover { border-color: #999; }
+  .day-cell.empty { background: transparent; border-color: transparent; cursor: default; }
+  .day-cell.sunday-cell   { background: var(--color-sun-bg); }
+  .day-cell.saturday-cell { background: var(--color-sat-bg); }
+  .day-cell.holiday-cell  { background: #fff8f8; }
+  .today-cell { border: 2px solid var(--color-today-border) !important; }
+  .this-week-cell { background: #f0f7f0 !important; }
+  .this-week-cell.sunday-cell   { background: #fff0f0 !important; }
+  .this-week-cell.saturday-cell { background: #f0f4ff !important; }
+
+  .day-cell.search-match { border: 2px solid #185FA5 !important; }
+  .day-cell.search-dim   { opacity: 0.3; }
+  .day-cell.search-focus { border: 3px solid #E24B4A !important; background: #fff8f8 !important; }
+
+  .day-num {
+    font-size: 0.8125em; font-weight: 700; color: #1a1a1a;
+    width: 24px; height: 24px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%; flex-shrink: 0;
+  }
+  .sunday-cell .day-num   { color: var(--color-dow-sun); }
+  .saturday-cell .day-num { color: var(--color-dow-sat); }
+  .today-cell .day-num    { background: var(--color-today-num); color: #fff; }
+
+  .ev-holiday { font-size: 0.6875em; color: var(--color-holiday-text); background: var(--color-holiday-bg); border-radius: 3px; padding: 2px 4px; line-height: 1.35; word-break: keep-all; }
+  .section-g3 { background: var(--color-g3-bg); border-radius: 4px; padding: 3px 5px; display: flex; flex-direction: column; gap: 2px; }
+  .section-g3-label { font-size: 0.625em; font-weight: 700; color: var(--color-g3-text); letter-spacing: 0.05em; margin-bottom: 1px; }
+  .ev-3rd { font-size: 0.6875em; font-weight: 500; color: var(--color-g3-text); background: var(--color-g3-item); border-radius: 3px; padding: 2px 4px; line-height: 1.4; word-break: keep-all; }
+  .section-school { background: var(--color-school-bg); border-radius: 4px; padding: 3px 5px; display: flex; flex-direction: column; gap: 2px; }
+  .section-school-label { font-size: 0.625em; font-weight: 700; color: var(--color-school-text); letter-spacing: 0.05em; margin-bottom: 1px; }
+  .ev-school { font-size: 0.6875em; color: var(--color-school-text); background: var(--color-school-item); border-radius: 3px; padding: 2px 4px; line-height: 1.4; word-break: keep-all; }
+  .ev-exam { font-size: 0.6875em; font-weight: 500; color: var(--color-exam-text); background: var(--color-exam-bg); border-radius: 3px; padding: 2px 4px; line-height: 1.4; word-break: keep-all; }
+
+  /* 플로팅 버튼 */
+  .fab-wrap { position: fixed; bottom: 2rem; right: 1.5rem; display: flex; flex-direction: column; gap: 10px; z-index: 150; }
+  .fab {
+    width: 48px; height: 48px; border-radius: 50%; border: none;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+    transition: transform 0.15s;
+    background: #185FA5; color: #fff;
+    font-size: 12px; font-family: 'Noto Sans KR', sans-serif; font-weight: 700;
+  }
+  .fab:hover { transform: scale(1.08); }
+
+  /* 모달 */
+  .overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.4); z-index:200; align-items:center; justify-content:center; padding:1rem; }
+  .overlay.open { display: flex; }
+  .modal { background:#fff; border-radius:14px; padding:1.4rem; width:100%; max-width:420px; box-shadow:0 8px 32px rgba(0,0,0,0.15); max-height:90vh; overflow-y:auto; }
+  .modal-date  { font-size:12px; color:#888; margin-bottom:4px; }
+  .modal-title { font-size:16px; font-weight:700; color:#1a1a1a; margin-bottom:14px; }
+  .modal-section { margin-bottom:12px; }
+  .modal-label { font-size:11px; font-weight:700; color:#888; margin-bottom:5px; letter-spacing:0.04em; }
+  .modal-item        { font-size:13px; color:var(--color-g3-text); background:var(--color-g3-item); border-radius:5px; padding:5px 9px; margin-bottom:4px; line-height:1.5; white-space:pre-line; }
+  .modal-item-school { font-size:12px; color:var(--color-school-text); background:var(--color-school-item); border-radius:5px; padding:4px 8px; margin-bottom:4px; line-height:1.5; white-space:pre-line; }
+  .modal-item-exam   { font-size:12px; color:var(--color-exam-text); background:var(--color-exam-bg); border-radius:5px; padding:4px 8px; margin-bottom:4px; line-height:1.5; white-space:pre-line; }
+  .modal-empty { font-size:13px; color:#aaa; }
+  .close-btn { margin-top:8px; width:100%; padding:9px; background:#f5f4f0; border:none; border-radius:8px; font-family:'Noto Sans KR',sans-serif; font-size:13px; color:#555; cursor:pointer; }
+  .close-btn:hover { background:#e8e6e0; }
+  .edit-btn  { margin-top:8px; width:100%; padding:9px; background:#185FA5; border:none; border-radius:8px; font-family:'Noto Sans KR',sans-serif; font-size:13px; color:#fff; cursor:pointer; }
+  .edit-btn:hover { background:#0C447C; }
+  .save-btn  { margin-top:8px; width:100%; padding:9px; background:#27500A; border:none; border-radius:8px; font-family:'Noto Sans KR',sans-serif; font-size:13px; color:#fff; cursor:pointer; }
+  .save-btn:hover { background:#173404; }
+  .save-btn:disabled { background:#aaa; cursor:not-allowed; }
+  .modal-textarea { width:100%; padding:8px 10px; border:1px solid #ddd; border-radius:8px; font-family:'Noto Sans KR',sans-serif; font-size:13px; color:#1a1a1a; resize:vertical; min-height:80px; line-height:1.6; }
+  .modal-textarea:focus { outline:none; border-color:#185FA5; }
+  .save-error { font-size:12px; color:#E24B4A; margin-top:4px; }
+
+  /* 색상 설정 */
+  .color-modal { max-width:360px; }
+  .color-row { display:flex; align-items:center; justify-content:space-between; padding:8px 0; border-bottom:1px solid #f0efeb; font-size:13px; color:#333; }
+  .color-row:last-child { border-bottom:none; }
+  .color-row input[type="color"] { width:36px; height:28px; border:1px solid #ddd; border-radius:4px; cursor:pointer; padding:0 2px; }
+  .color-reset-btn { margin-top:10px; width:100%; padding:8px; background:#f5f4f0; border:none; border-radius:8px; font-family:'Noto Sans KR',sans-serif; font-size:13px; color:#555; cursor:pointer; }
+
+  /* 3학년부 팝업 */
+  .g3-filter { display:flex; gap:6px; margin-bottom:12px; flex-wrap:wrap; }
+  .g3-filter-btn { background:#fff; border:1px solid #ddd; border-radius:16px; padding:4px 12px; font-size:12px; font-family:'Noto Sans KR',sans-serif; color:#555; cursor:pointer; }
+  .g3-filter-btn.active { background:#0F6E56; color:#fff; border-color:#0F6E56; }
+  .g3-count { font-size:12px; color:#888; margin-bottom:8px; }
+  .g3-item { display:flex; gap:12px; padding:10px 0; border-bottom:1px solid #f0efeb; cursor:pointer; }
+  .g3-item:hover { background:#f5f4f0; border-radius:6px; padding:10px 6px; margin:0 -6px; }
+  .g3-item:last-child { border-bottom:none; }
+  .g3-date-col { flex-shrink:0; width:80px; }
+  .g3-date { font-size:13px; font-weight:700; color:#1a1a1a; }
+  .g3-dow  { font-size:11px; color:#888; margin-top:1px; }
+  .g3-content { flex:1; }
+  .g3-tag  { display:inline-block; font-size:11px; font-weight:700; color:#0C447C; background:#E6F1FB; border-radius:10px; padding:2px 8px; margin-bottom:4px; }
+  .g3-text { font-size:13px; color:#1a1a1a; line-height:1.5; }
+  .g3-empty { font-size:13px; color:#aaa; text-align:center; padding:2rem 0; }
+
+  /* 인쇄 */
+  @media print {
+    .top-header, .top-panels, .cal-controls, .fab-wrap, .overlay,
+    .sticky-month-row, .search-result-bar { display:none !important; }
+    .cal-sticky { position: static; }
+    .page-wrap { padding: 0; max-width: 100%; }
+    .cal-body { border:none; border-radius:0; padding:0; }
+    .month-block.print-hidden { display:none !important; }
+    .sticky-dow-row { display:grid !important; position:static; border:none; padding:4px 0; }
+    .dow-row { display:grid !important; grid-template-columns:repeat(7,minmax(0,1fr)); gap:2px; margin-bottom:4px; }
+    .day-cell { min-height:60px; }
+    .ev-3rd, .ev-school, .ev-exam { font-size:9px; }
+  }
+
+  /* 모바일 */
+  @media (max-width: 768px) {
+    .top-panels { grid-template-columns: 1fr; }
+    .panel { max-height: 150px; }
+  }
+  @media (max-width: 900px) and (min-width: 769px) {
+    .top-panels { grid-template-columns: 1fr 1fr 1fr; }
+    .panel { max-height: 180px; }
+    .page-wrap { padding: 0.8rem 0.6rem 3rem; }
+  }
+  @media (max-width: 600px) {
+    .page-wrap { padding: 0.6rem 0.4rem 3rem; }
+    .day-cell { min-height: 55px; padding: 3px; }
+    .day-num  { font-size: 11px; width: 20px; height: 20px; }
+    .ev-3rd, .ev-school, .ev-exam { font-size: 9px; }
+    .search-input { width: 130px; }
+  }
+
+  /* ── 급식/시간표 팝업 ── */
+  .neis-content { font-size: 12px; color: #333; line-height: 1.7; }
+  .neis-content .menu-item { padding: 2px 0; border-bottom: 1px solid #f5f4f0; }
+  .neis-content .menu-item:last-child { border-bottom: none; }
+  .neis-date-bar {
+    display: flex; align-items: center; gap: 6px;
+    margin-bottom: 8px; flex-shrink: 0;
+  }
+  .neis-date-btn {
+    background: #f5f4f0; border: 1px solid #ddd; border-radius: 5px;
+    padding: 3px 8px; font-size: 11px; cursor: pointer; color: #333;
+  }
+  .neis-date-btn:hover { background: #e8e6e0; }
+  .neis-date-label { font-size: 12px; font-weight: 700; color: #185FA5; }
+  .neis-empty { font-size: 12px; color: #aaa; padding: 8px 0; }
+  .timetable-grid { display: flex; flex-direction: column; gap: 3px; }
+  .timetable-row { display: flex; gap: 3px; align-items: center; }
+  .timetable-period { font-size: 11px; font-weight: 700; color: #888; width: 20px; flex-shrink: 0; }
+  .timetable-subj {
+    font-size: 11px; background: #E6F1FB; color: #0C447C;
+    border-radius: 4px; padding: 2px 6px; flex: 1; text-align: center;
+  }
+  .neis-class-select { display: flex; gap: 4px; margin-bottom: 8px; flex-wrap: wrap; flex-shrink: 0; }
+  .neis-class-btn {
+    background: #f5f4f0; border: 1px solid #ddd; border-radius: 5px;
+    padding: 2px 8px; font-size: 11px; cursor: pointer; color: #333;
+  }
+  .neis-class-btn.active { background: #0F6E56; color: #fff; border-color: #0F6E56; }
+
+  /* ── 컴팩트 모드 헤더 축소 (PC 전용) ── */
+  .compact-header .cal-controls {
+    padding: 4px 10px;
+    gap: 5px;
+  }
+  .compact-header .ctrl-btn,
+  .compact-header .zoom-btn,
+  .compact-header .view-tab-btn,
+  .compact-header .refresh-btn {
+    font-size: 11px;
+    padding: 3px 7px;
+  }
+  .compact-header .search-input {
+    width: 120px;
+    font-size: 11px;
+    padding: 3px 7px;
+  }
+  .compact-header .zoom-value,
+  .compact-header .search-nav-info { font-size: 11px; }
+  .compact-header .sticky-month-label { font-size: 0.88em; }
+  .compact-header .sticky-month-row { padding: 4px 10px; }
+  .compact-header .sticky-dow-cell { font-size: 0.72em; padding: 4px 0; }
+  .compact-header .ctrl-divider { height: 16px; }
+
+  /* ── 컴팩트 모드 글자 크기 통일 ── */
+  .compact-mode .ev-holiday {
+    font-size: 0.57em;
+    padding: 1px 2px;
+    line-height: 1.25;
+    margin-bottom: 1px;
+  }
+  .compact-mode .day-num {
+    font-size: 0.72em;
+    width: 18px; height: 18px;
+    margin: 0 0 2px 0;
+  }
+  .compact-mode .compact-more { font-size: 0.57em; }
+  .compact-mode .cal-grid {
+    grid-template-columns: repeat(7, minmax(0, 0.5fr));
+  }
+  .compact-mode ~ .sticky-cal-header .sticky-dow-row,
+  #cal-zoom-wrap.compact-wrap .sticky-dow-row {
+    grid-template-columns: repeat(7, minmax(0, 0.5fr));
+  }
+  .compact-mode .day-cell {
+    min-height: var(--compact-cell-h, 110px) !important;
+    max-height: var(--compact-cell-h, 110px) !important;
+    overflow: hidden;
+    position: relative;
+    align-items: flex-start !important;
+    justify-content: flex-start !important;
+    text-align: left;
+  }
+  .compact-mode .day-num {
+    margin: 0 0 4px 0;
+  }
+  .compact-mode .section-g3,
+  .compact-mode .section-school { display: none; }
+  .compact-line {
+    display: flex; align-items: center; justify-content: flex-start; gap: 2px;
+    font-size: 0.57em; line-height: 1.25;
+    padding: 1px 2px; border-radius: 3px;
+    overflow: hidden; white-space: nowrap;
+    margin-bottom: 1px;
+    max-width: 100%;
+  }
+  .compact-line.g3   { background: var(--color-g3-item);     color: var(--color-g3-text); }
+  .compact-line.sch  { background: var(--color-school-item);  color: var(--color-school-text); }
+  .compact-line.exam { background: var(--color-exam-bg);      color: var(--color-exam-text); }
+  .compact-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+  .compact-dot.g3   { background: var(--color-g3-text); }
+  .compact-dot.sch  { background: var(--color-school-text); }
+  .compact-dot.exam { background: var(--color-exam-text); }
+  .compact-text { overflow: hidden; text-overflow: ellipsis; }
+  .compact-more { font-size: 0.6em; color: #999; flex-shrink: 0; }
+
+  /* 툴팁 */
+  .day-cell .cal-tooltip {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.18);
+    padding: 10px 13px;
+    min-width: 170px;
+    max-width: 260px;
+    font-size: 12.5px;
+    line-height: 1.7;
+    color: #222;
+    pointer-events: none;
+    white-space: pre-wrap;
+    word-break: keep-all;
+    text-align: left;
+  }
+  .compact-mode .day-cell:hover .cal-tooltip { display: block; }
+
+
+  /* ── 페이지 모드 ── */
+  .page-nav-mode .month-title { display: none !important; }
+  .page-nav-mode .month-header { display: none !important; }
+  .cal-body.page-nav-mode .month-title { display: none !important; }
+  .cal-body.page-nav-mode .month-header { display: none !important; }
+  .page-mode-nav {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 10px 0 6px;
+    background: #fff;
+    border-left: 1px solid #e0deda;
+    border-right: 1px solid #e0deda;
+  }
+  .page-mode-nav.visible { display: flex; }
+  .page-nav-btn {
+    background: #f5f4f0; border: 1px solid #ddd; border-radius: 8px;
+    padding: 6px 18px; font-size: 14px; cursor: pointer; color: #333;
+    transition: background 0.15s;
+  }
+  .page-nav-btn:hover { background: #e0deda; }
+  .page-nav-label {
+    font-size: 18px; font-weight: 700; color: #1a1a1a;
+    min-width: 140px; text-align: center;
+  }
+
+
+  /* 공지 팝업 */
+  .notice-popup-title {
+    font-size: 16px; font-weight: 700; color: #1a1a1a;
+    margin-bottom: 12px; line-height: 1.4;
+  }
+  .notice-popup-body {
+    font-size: 14px; color: #333; line-height: 1.8;
+    white-space: pre-line; word-break: keep-all;
+  }
+  .notice-done-check {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 12px; color: #888; cursor: pointer;
+    padding: 4px 0; user-select: none;
+  }
+  .notice-done-check input { cursor: pointer; }
+  .notice-item.done .notice-title-text {
+    text-decoration: line-through; color: #bbb;
+  }
+  .notice-item.done .notice-dot { background: #ccc; }
+  .notice-item.done { order: 999; }
+  #notice-list { display: flex; flex-direction: column; }
+
+
+  /* 팝업 글씨 조절 */
+  .popup-font-ctrl {
+    display: flex; align-items: center; gap: 4px;
+  }
+  .popup-font-btn {
+    background: #f5f4f0; border: 1px solid #ddd; border-radius: 5px;
+    padding: 2px 8px; font-size: 11px; cursor: pointer; color: #555;
+    font-family: 'Noto Sans KR', sans-serif;
+  }
+  .popup-font-btn:hover { background: #e8e6e0; }
+  .popup-font-val { font-size: 11px; color: #888; min-width: 28px; text-align: center; }
+
+
+
+
+  /* 모바일 패널 */
+  .mobile-panel-wrap {
+    border-bottom: 1px solid #e8e6e0;
+    background: #fff;
+  }
+  .mobile-panel-header {
+    display: flex; align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    font-size: 13px; font-weight: 700; color: #1a1a1a;
+    cursor: pointer;
+  }
+  .mobile-panel-header:active { background: #f5f4f0; }
+  .mobile-panel-arrow { font-size: 11px; color: #aaa; transition: transform 0.2s; }
+  .mobile-panel-arrow.open { transform: rotate(180deg); }
+  .mobile-panel-body { background: #fafaf8; }
+
+  /* PC에서 모바일 요소 완전 숨김 */
+  .mobile-header,
+  .mobile-panels,
+  #mobile-panels,
+  #mobile-top-title,
+  .mobile-drawer,
+  .mobile-drawer-overlay { display: none !important; }
+  .mobile-drawer.open { display: block !important; }
+  .mobile-drawer-overlay.open { display: block !important; }
+
+  /* ═══════════════════════════════════
+     모바일 전용 UI (768px 이하)
+  ═══════════════════════════════════ */
+  @media (max-width: 768px) {
+
+    /* 기본 여백 */
+    .page-wrap { padding: 0 0 4rem; }
+
+    /* 모바일 요소 표시 */
+    .mobile-header { display: flex !important; }
+    #mobile-panels { display: block !important; }
+    #mobile-top-title { display: block !important; }
+    .mobile-header {
+      flex-direction: column !important;
+      align-items: stretch !important;
+      padding: 8px 14px 8px !important;
+    }
+    .mobile-view-btn {
+      flex: 1;
+      background: #f5f4f0; border: 1px solid #ddd;
+      border-radius: 6px; padding: 5px 0;
+      font-size: 12px; font-weight: 500;
+      font-family: 'Noto Sans KR', sans-serif;
+      color: #555; cursor: pointer;
+    }
+    .mobile-view-btn.active {
+      background: #185FA5; color: #fff; border-color: #185FA5;
+    }
+    #mobile-panels { display: block !important; }
+
+    /* 상단 패널 숨김 */
+    .top-header, .top-panels { display: none; }
+
+    /* 컨트롤 바 완전 교체 */
+    .cal-sticky { padding: 0; background: #fff; }
+    .cal-controls { display: none !important; }
+    .search-result-bar { display: none !important; }
+
+    /* 모바일 헤더 */
+    .mobile-header {
+      display: flex !important;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      background: #fff;
+      border-bottom: 1px solid #e0deda;
+      position: sticky; top: 0; z-index: 200;
+    }
+    .mobile-month-nav {
+      display: flex; align-items: center; gap: 8px;
+    }
+    .mobile-nav-btn {
+      background: none; border: none; font-size: 18px;
+      cursor: pointer; color: #185FA5; padding: 4px 8px;
+      border-radius: 6px;
+    }
+    .mobile-nav-btn:hover { background: #f0f4ff; }
+    .mobile-month-label {
+      font-size: 16px; font-weight: 700; color: #1a1a1a;
+      min-width: 110px; text-align: center;
+    }
+    .mobile-menu-btn {
+      background: none; border: none; font-size: 20px;
+      cursor: pointer; color: #555; padding: 4px 8px;
+    }
+
+    /* 모바일 슬라이드 메뉴 */
+    .mobile-drawer {
+      display: none;
+      position: fixed; top: 0; right: 0;
+      width: 75%; max-width: 280px; height: 100%;
+      background: #fff; z-index: 500;
+      box-shadow: -4px 0 20px rgba(0,0,0,0.15);
+      padding: 20px 16px;
+      overflow-y: auto;
+      transform: translateX(100%);
+      transition: transform 0.25s ease;
+    }
+    .mobile-drawer.open {
+      display: block;
+      transform: translateX(0);
+    }
+    .mobile-drawer-overlay {
+      display: none;
+      position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.3);
+      z-index: 499;
+    }
+    .mobile-drawer-overlay.open { display: block; }
+    .mobile-drawer-title {
+      font-size: 15px; font-weight: 700; color: #1a1a1a;
+      margin-bottom: 16px; padding-bottom: 10px;
+      border-bottom: 1px solid #f0efeb;
+    }
+    .mobile-drawer-section { margin-bottom: 16px; }
+    .mobile-drawer-label {
+      font-size: 11px; color: #888; font-weight: 700;
+      margin-bottom: 6px; letter-spacing: 0.05em;
+    }
+    .mobile-drawer-btns {
+      display: flex; flex-wrap: wrap; gap: 6px;
+    }
+    .mobile-drawer-btn {
+      background: #f5f4f0; border: 1px solid #ddd;
+      border-radius: 6px; padding: 6px 12px;
+      font-size: 13px; font-family: 'Noto Sans KR', sans-serif;
+      color: #333; cursor: pointer;
+    }
+    .mobile-drawer-btn.active {
+      background: #185FA5; color: #fff; border-color: #185FA5;
+    }
+    .mobile-drawer-btn.g3 {
+      background: #0F6E56; color: #fff; border-color: #0F6E56;
+    }
+    .mobile-search-wrap {
+      display: flex; gap: 6px; margin-bottom: 4px;
+    }
+    .mobile-search-input {
+      flex: 1; padding: 8px 12px;
+      border: 1.5px solid #ddd; border-radius: 8px;
+      font-size: 14px; font-family: 'Noto Sans KR', sans-serif;
+      outline: none;
+    }
+    .mobile-search-input:focus { border-color: #185FA5; }
+
+    /* 요일 헤더 */
+    .sticky-month-row { display: none !important; }
+    .sticky-dow-row {
+      grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+      padding: 4px 2px !important;
+      border: none !important;
+      background: #fff !important;
+    }
+    .sticky-dow-cell {
+      font-size: 11px !important;
+      padding: 4px 0 !important;
+    }
+
+    /* 달력 본문 */
+    .cal-body { border: none !important; border-radius: 0 !important; padding: 2px !important; }
+    .month-title { display: none !important; }
+
+    .cal-grid { gap: 1px !important; }
+    .day-cell {
+      min-height: 64px !important;
+      max-height: 64px !important;
+      padding: 3px 2px !important;
+      overflow: hidden !important;
+      border-radius: 4px !important;
+    }
+    .day-num {
+      font-size: 12px !important;
+      width: 20px !important; height: 20px !important;
+      margin-bottom: 2px !important;
+    }
+
+    /* 모바일 일정 표시 */
+    .section-g3, .section-school { display: none !important; }
+    .mobile-ev {
+      display: flex; align-items: center; gap: 2px;
+      font-size: 10px; line-height: 1.2;
+      overflow: hidden; white-space: nowrap;
+      margin-bottom: 1px; border-radius: 2px;
+      padding: 1px 2px;
+    }
+    .mobile-ev.g3   { background: var(--color-g3-item); color: var(--color-g3-text); }
+    .mobile-ev.sch  { background: var(--color-school-item); color: var(--color-school-text); }
+    .mobile-ev.exam { background: var(--color-exam-bg); color: var(--color-exam-text); }
+    .mobile-ev.holi { background: var(--color-holiday-bg); color: var(--color-holiday-text); }
+    .mobile-ev-dot {
+      width: 4px; height: 4px; border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .mobile-ev-dot.g3   { background: var(--color-g3-text); }
+    .mobile-ev-dot.sch  { background: var(--color-school-text); }
+    .mobile-ev-dot.exam { background: var(--color-exam-text); }
+    .mobile-ev-dot.holi { background: var(--color-holiday-text); }
+    .mobile-ev-text {
+      overflow: hidden; text-overflow: ellipsis;
+      white-space: nowrap; max-width: 100%;
+    }
+    .mobile-ev-more {
+      font-size: 9px; color: #999; flex-shrink: 0;
+    }
+
+    /* compact-mode override */
+    .compact-mode .day-cell {
+      min-height: 64px !important;
+      max-height: 64px !important;
+    }
+
+    /* 플로팅 버튼 */
+    .fab { width: 44px !important; height: 44px !important; font-size: 11px !important; }
+  }
+
+
+  /* ── 🎲 도구 툴박스 ── */
+  @keyframes pulse     { 0%,100%{opacity:1;transform:scale(1);}  50%{opacity:0.5;transform:scale(1.05);} }
+  @keyframes slideUp   { from{transform:translateY(24px);opacity:0;} to{transform:translateY(0);opacity:1;} }
+  @keyframes spinPick  { 0%{transform:translateY(-4px);} 50%{transform:translateY(4px);} 100%{transform:translateY(-4px);} }
+  @keyframes popBounce { 0%{transform:scale(0);opacity:0;} 60%{transform:scale(1.15);opacity:1;} 80%{transform:scale(0.95);} 100%{transform:scale(1);} }
+  @keyframes ladderDraw { from{stroke-dashoffset:2000;} to{stroke-dashoffset:0;} }
+
+  .tool-tab {
+    background:none; border:1px solid #333355; border-radius:8px;
+    color:#ccd; font-size:15px; padding:9px 18px; cursor:pointer;
+    font-family:'Noto Sans KR',sans-serif; transition:all 0.2s; white-space:nowrap;
+    font-weight:500;
+  }
+  .tool-tab:hover { border-color:#6666bb; color:#eef; background:#1a1a33; }
+  .tool-tab.active { background:#2a2a6a; border-color:#7777ee; color:#fff; font-weight:700; }
+
+  .tool-panel {
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:40px 24px; width:100%; animation:slideUp 0.3s ease;
+  }
+  .tool-panel-light {
+    background:#f8f7f4; border-radius:20px; margin:20px;
+    animation:slideUp 0.3s ease; box-shadow:0 8px 40px rgba(0,0,0,0.08);
+  }
+
+  .tool-btn {
+    border:none; border-radius:14px; padding:14px 28px;
+    font-size:16px; font-weight:700; cursor:pointer;
+    font-family:'Noto Sans KR',sans-serif; transition:all 0.15s; letter-spacing:0.02em;
+  }
+  .tool-btn.primary  { background:#3a3acc; color:#fff; box-shadow:0 4px 20px rgba(60,60,220,0.4); }
+  .tool-btn.primary:hover  { background:#4a4adc; transform:translateY(-2px); }
+  .tool-btn.secondary { background:#1c1c38; color:#88f; border:1px solid #333; }
+  .tool-btn.secondary:hover { background:#252548; }
+  .tool-btn.ghost { background:none; color:#445; border:1px solid #222; }
+  .tool-btn.ghost:hover { color:#888; border-color:#444; }
+
+  .tool-btn-light {
+    background:#1a1a8a; color:#fff; border:none; border-radius:14px;
+    padding:12px 24px; font-size:15px; font-weight:700; cursor:pointer;
+    font-family:'Noto Sans KR',sans-serif; transition:all 0.15s;
+    box-shadow:0 4px 16px rgba(26,26,138,0.3); display:block;
+  }
+  .tool-btn-light:hover { background:#2a2a9a; transform:translateY(-1px); }
+  .tool-btn-ghost-light {
+    background:none; color:#888; border:1px solid #ddd; border-radius:10px;
+    padding:10px 24px; font-size:14px; cursor:pointer;
+    font-family:'Noto Sans KR',sans-serif; transition:all 0.15s;
+  }
+  .tool-btn-ghost-light:hover { border-color:#aaa; color:#555; }
+
+  .timer-input {
+    background:#1a1a2e; border:1px solid #2a2a4a; border-radius:10px;
+    color:#fff; font-size:32px; font-weight:700; text-align:center;
+    width:90px; padding:10px 8px; outline:none;
+    font-family:'Noto Sans KR',sans-serif;
+  }
+  .timer-input:focus { border-color:#5555cc; box-shadow:0 0 0 3px rgba(85,85,204,0.2); }
+
+  .timer-input-light {
+    background:#fff; border:2px solid #e0deda; border-radius:10px;
+    color:#1a1a1a; font-size:24px; font-weight:700; text-align:center;
+    padding:8px; outline:none; font-family:'Noto Sans KR',sans-serif;
+  }
+  .timer-input-light:focus { border-color:#1a1a8a; }
+
+  .tool-textarea-light {
+    background:#fff; border:1.5px solid #e0deda; border-radius:10px;
+    color:#333; font-size:14px; padding:12px; outline:none; resize:none;
+    font-family:'Noto Sans KR',sans-serif; line-height:1.7;
+    width:100%; box-sizing:border-box; transition:border-color 0.2s;
+  }
+  .tool-textarea-light:focus { border-color:#1a1a8a; }
+
+  .sw-lap-item {
+    display:flex; justify-content:space-between;
+    padding:7px 14px; border-bottom:1px solid #111;
+    font-size:13px; font-variant-numeric:tabular-nums; color:#446;
+  }
+  .sw-lap-item:first-child { color:#aaf; background:#0d0d22; }
+
+  .lottery-badge-light {
+    background:#fff; border:2px solid #e0deda; border-radius:18px;
+    padding:18px 28px; text-align:center; min-width:110px;
+    box-shadow:0 4px 20px rgba(0,0,0,0.08);
+    animation:popBounce 0.5s cubic-bezier(0.34,1.56,0.64,1) both;
+  }
+  .lottery-badge-rank { font-size:11px; font-weight:700; color:#aaa; margin-bottom:4px; letter-spacing:0.05em; }
+  .lottery-badge-name { font-size:clamp(48px,8vw,90px); font-weight:900; color:#1a1a1a; line-height:1; }
+  .lottery-badge-rank { font-size:14px; }
+  .lottery-badge-light { padding:28px 44px; min-width:180px; }
+
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
+</head>
+<body>
+
+<div class="page-wrap">
+
+  <!-- 최상단 헤더 -->
+  <div class="top-header">
+    <div>
+      <h1>2026학년도 학사일정</h1>
+    </div>
+    <div class="status-bar">
+      <button class="refresh-btn" onclick="openToolbox()" style="background:none;border-color:transparent;color:#aaa;font-size:16px;padding:4px 8px;">🎲</button>
+      <a href="https://myys-h.goesw.kr/myys-h/na/ntt/selectNttList.do?mi=17174&bbsId=10012" target="_blank" rel="noopener" class="refresh-btn" style="background:#f0f7f0;border-color:#639922;color:#2d5a0e;text-decoration:none;">📄 가정통신문</a>
+      <button class="refresh-btn" onclick="openMealPopup()" style="background:#fff7e6;border-color:#EF9F27;color:#854F0B;">🍱 급식정보</button>
+      <button class="refresh-btn" onclick="openTTPopup()" style="background:#e6f1fb;border-color:#85B7EB;color:#0C447C;">📅 시간표</button>
+      <div class="status-dot" id="status-dot"></div>
+      <span id="status-text">데이터 불러오는 중...</span>
+      <button class="refresh-btn" onclick="loadData()">새로고침</button>
+    </div>
+  </div>
+
+  <!-- 상단 3칸 패널 -->
+  <div class="top-panels">
+    <!-- 링크 패널 -->
+    <div class="panel">
+      <div class="panel-title">
+        <span class="panel-title-left">🔗 주요 링크 바로가기</span>
+        <button class="panel-edit-btn" onclick="openLinkEditModal()">✏️ 수정</button>
+      </div>
+      <div class="link-grid" id="link-grid">
+        <span style="font-size:12px;color:#aaa;">불러오는 중...</span>
+      </div>
+    </div>
+    <!-- 공지사항 패널 -->
+    <div class="panel">
+      <div class="panel-title">
+        <span class="panel-title-left">📢 공지사항</span>
+        <button class="panel-edit-btn" onclick="openNoticeEditModal()">✏️ 수정</button>
+      </div>
+      <div id="notice-list">
+        <span class="notice-empty">불러오는 중...</span>
+      </div>
+    </div>
+    <!-- 3학년부 요약 패널 -->
+    <div class="panel">
+      <div class="panel-title">
+        <span class="panel-title-left">📋 3학년부 일정 요약</span>
+        <button class="panel-edit-btn" onclick="openG3Panel()" style="background:#0F6E56;color:#fff;border-color:#0F6E56;">전체보기</button>
+      </div>
+      <div id="summary-list">
+        <span class="summary-empty">불러오는 중...</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 모바일 최상단 제목 -->
+  <div id="mobile-top-title" style="display:none;text-align:center;padding:12px 0 6px;font-size:16px;font-weight:700;color:#185FA5;background:#fff;border-bottom:1px solid #e8e6e0;">
+    3학년부 학사일정
+  </div>
+
+  <!-- 모바일 상단 패널 -->
+  <div id="mobile-panels" style="display:none;">
+    <!-- 바로가기 버튼 -->
+    <div style="display:flex;gap:6px;padding:10px 12px;background:#fff;border-bottom:1px solid #e8e6e0;overflow-x:auto;">
+      <a href="https://myys-h.goesw.kr/myys-h/na/ntt/selectNttList.do?mi=17174&bbsId=10012"
+         target="_blank" rel="noopener"
+         style="flex-shrink:0;background:#f0f7f0;border:1px solid #639922;color:#2d5a0e;border-radius:8px;padding:7px 12px;font-size:12px;font-family:'Noto Sans KR',sans-serif;text-decoration:none;white-space:nowrap;">📄 가정통신문</a>
+      <button onclick="openMealPopup()"
+         style="flex-shrink:0;background:#fff7e6;border:1px solid #EF9F27;color:#854F0B;border-radius:8px;padding:7px 12px;font-size:12px;font-family:'Noto Sans KR',sans-serif;cursor:pointer;white-space:nowrap;">🍱 급식정보</button>
+      <button onclick="openTTPopup()"
+         style="flex-shrink:0;background:#e6f1fb;border:1px solid #85B7EB;color:#0C447C;border-radius:8px;padding:7px 12px;font-size:12px;font-family:'Noto Sans KR',sans-serif;cursor:pointer;white-space:nowrap;">📅 시간표</button>
+    </div>
+    <!-- 링크 -->
+    <div class="mobile-panel-wrap">
+      <div class="mobile-panel-header" onclick="toggleMobilePanel('mob-links')">
+        <span>🔗 주요 링크</span>
+        <span class="mobile-panel-arrow" id="mob-links-arrow">▼</span>
+      </div>
+      <div class="mobile-panel-body" id="mob-links" style="display:none;">
+        <div class="link-grid" id="mob-link-grid" style="padding:8px 4px;"></div>
+      </div>
+    </div>
+    <!-- 공지사항 -->
+    <div class="mobile-panel-wrap">
+      <div class="mobile-panel-header" onclick="toggleMobilePanel('mob-notices')">
+        <span>📢 공지사항</span>
+        <span class="mobile-panel-arrow" id="mob-notices-arrow">▼</span>
+      </div>
+      <div class="mobile-panel-body" id="mob-notices" style="display:none;">
+        <div id="mob-notice-list" style="padding:4px;"></div>
+      </div>
+    </div>
+    <!-- 3학년부 요약 -->
+    <div class="mobile-panel-wrap">
+      <div class="mobile-panel-header" onclick="toggleMobilePanel('mob-summary')">
+        <span>📋 3학년부 일정</span>
+        <span class="mobile-panel-arrow" id="mob-summary-arrow">▼</span>
+      </div>
+      <div class="mobile-panel-body" id="mob-summary" style="display:none;">
+        <div id="mob-summary-list" style="padding:4px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 모바일 헤더 (PC에서는 display:none) -->
+  <div class="mobile-header" style="display:none;" id="mobile-header">
+    <div style="display:flex;align-items:center;justify-content:center;gap:8px;">
+      <button class="mobile-nav-btn" onclick="mobilePageNav(-1)">◀</button>
+      <span class="mobile-month-label" id="mobile-month-label">2026년 4월</span>
+      <button class="mobile-nav-btn" onclick="mobilePageNav(1)">▶</button>
+    </div>
+    <div style="display:flex;gap:5px;justify-content:center;margin-top:6px;">
+      <button class="mobile-view-btn active" id="mob-view-all2"
+        onclick="mobileSetView('all')">전체</button>
+      <button class="mobile-view-btn" id="mob-view-g32"
+        onclick="mobileSetView('g3')">3학년부</button>
+      <button class="mobile-view-btn" id="mob-view-school2"
+        onclick="mobileSetView('school')">학교</button>
+    </div>
+  </div>
+
+  <!-- 모바일 드로어 오버레이 -->
+  <div class="mobile-drawer-overlay" id="mobile-drawer-overlay" onclick="closeMobileDrawer()"></div>
+
+  <!-- 모바일 드로어 제거됨 -->
+
+  <!-- 달력 고정 헤더 + 본문 -->
+  <div class="cal-sticky" id="cal-sticky">
+    <!-- 컨트롤 바 래퍼 (컴팩트 시 달력 너비에 맞춰 좁아짐) -->
+    <div id="cal-controls-wrap">
+    <!-- 1줄: 보기 필터 / 모드 / 탐색 / 페이지 이동 -->
+    <div class="cal-controls cal-controls-row1">
+      <div class="ctrl-group">
+        <button class="view-tab-btn active" id="view-all" onclick="setViewMode('all',this)">전체</button>
+        <button class="view-tab-btn" id="view-g3" onclick="setViewMode('g3',this)">3학년부</button>
+        <button class="view-tab-btn" id="view-school" onclick="setViewMode('school',this)">학교</button>
+      </div>
+      <div class="ctrl-divider"></div>
+      <div class="ctrl-group">
+        <button class="view-tab-btn active" id="mode-full" onclick="setDisplayMode('full',this)">전체</button>
+        <button class="view-tab-btn" id="mode-compact" onclick="setDisplayMode('compact',this)">컴팩트</button>
+      </div>
+      <div class="ctrl-divider"></div>
+      <div class="ctrl-group">
+        <button class="view-tab-btn active" id="nav-scroll" onclick="setNavMode('scroll',this)">스크롤</button>
+        <button class="view-tab-btn" id="nav-page" onclick="setNavMode('page',this)">페이지</button>
+        <button class="view-tab-btn" id="nav-full" onclick="toggleFullWidth(this)" title="가로 최대화">최대화면</button>
+      </div>
+      <div class="ctrl-spacer"></div>
+      <div class="ctrl-group">
+        <button class="ctrl-btn g3" onclick="openG3Panel()">📋 3학년부</button>
+        <button class="ctrl-btn" onclick="scrollToToday()" style="background:#185FA5;color:#fff;border-color:#185FA5;">오늘</button>
+      </div>
+    </div>
+    <!-- 2줄: 글씨 크기 / 검색+페이지네비(중앙) / 보조 기능 -->
+    <div class="cal-controls cal-controls-row2">
+      <div class="ctrl-group">
+        <button class="zoom-btn" ondblclick="fontReset()" onclick="fontDown()" title="더블클릭: 초기화">가−</button>
+        <span class="zoom-value" id="font-value">100%</span>
+        <button class="zoom-btn" ondblclick="fontReset()" onclick="fontUp()" title="더블클릭: 초기화">가+</button>
+      </div>
+      <div class="ctrl-divider"></div>
+      <div class="ctrl-group">
+        <input class="search-input" id="search-input" type="text"
+               placeholder="일정 검색..."
+               oninput="onSearch(this.value)"
+               onkeydown="if(event.key==='Enter') searchNext()" />
+        <button class="search-clear" id="search-clear" onclick="clearSearch()">✕</button>
+        <div class="search-nav" id="search-nav">
+          <button class="search-nav-btn" onclick="searchPrev()">◀</button>
+          <span class="search-nav-info" id="search-nav-info">0/0</span>
+          <button class="search-nav-btn" onclick="searchNext()">▶</button>
+        </div>
+      </div>
+      <div class="ctrl-spacer"></div>
+      <div class="ctrl-group page-nav-inline" id="page-nav-group" style="display:none;">
+        <button class="search-nav-btn" onclick="pageNav(-1)">◀</button>
+        <span class="zoom-value" id="page-nav-label" style="min-width:80px;text-align:center;">2026년 3월</span>
+        <button class="search-nav-btn" onclick="pageNav(1)">▶</button>
+      </div>
+      <div class="ctrl-spacer"></div>
+      <div class="ctrl-group">
+        <button class="ctrl-btn" onclick="printCurrentMonth()">🖨 인쇄</button>
+        <button class="ctrl-btn" onclick="openColorModal()">🎨 색상</button>
+      </div>
+    </div>
+    <div class="search-result-bar" id="search-result-bar"></div>
+    </div><!-- /cal-controls-wrap -->
+    <!-- 월 라벨 + 요일 헤더 -->
+    <div id="cal-zoom-wrap-header">
+      <div class="sticky-month-row">
+        <div class="sticky-month-label" id="sticky-month-label">2026년 3월</div>
+      </div>
+      <div class="sticky-dow-row">
+        <div class="sticky-dow-cell sun">일</div>
+        <div class="sticky-dow-cell">월</div>
+        <div class="sticky-dow-cell">화</div>
+        <div class="sticky-dow-cell">수</div>
+        <div class="sticky-dow-cell">목</div>
+        <div class="sticky-dow-cell">금</div>
+        <div class="sticky-dow-cell sat">토</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 줌 래퍼: 달력 본문 -->
+  <div id="cal-zoom-wrap" style="margin: 0 auto;">
+    <!-- 달력 본문 -->
+    <div class="cal-body">
+      <div id="months-container"></div>
+    </div>
+  </div>
+
+</div><!-- /page-wrap -->
+
+<!-- 플로팅 버튼 -->
+<div class="fab-wrap">
+  <button class="fab" onclick="scrollToToday()" title="오늘로 이동">오늘</button>
+</div>
+
+<!-- 링크 수정 모달 -->
+<div class="overlay" id="link-edit-overlay" onclick="closeLinkEditModal(event)">
+  <div class="modal" style="max-width:460px;">
+    <div class="modal-title">🔗 주요 링크 수정</div>
+    <div id="link-edit-list"></div>
+    <div style="margin-top:12px;padding-top:12px;border-top:1px solid #f0efeb;">
+      <div class="modal-label">새 링크 추가</div>
+      <div style="display:flex;gap:6px;margin-top:6px;">
+        <input id="new-link-title" type="text" class="modal-textarea" style="min-height:unset;height:36px;resize:none;flex:1;" placeholder="제목" />
+        <input id="new-link-url" type="url" class="modal-textarea" style="min-height:unset;height:36px;resize:none;flex:2;" placeholder="https://..." />
+      </div>
+      <button class="save-btn" style="margin-top:8px;" onclick="addLinkItem()">추가</button>
+    </div>
+    <div class="save-error" id="link-edit-error"></div>
+    <button class="close-btn" onclick="closeLinkEditModal()">닫기</button>
+  </div>
+</div>
+
+<!-- 공지 수정 모달 -->
+<div class="overlay" id="notice-edit-overlay" onclick="closeNoticeEditModal(event)">
+  <div class="modal" style="max-width:460px;">
+    <div class="modal-title">📢 공지사항 수정</div>
+    <div id="notice-edit-list"></div>
+    <div style="margin-top:12px;padding-top:12px;border-top:1px solid #f0efeb;">
+      <div class="modal-label">새 공지 추가</div>
+      <input id="new-notice-title" class="modal-textarea" type="text"
+             style="min-height:unset;height:38px;resize:none;margin-top:6px;" placeholder="제목 (필수)" />
+      <textarea id="new-notice-content" class="modal-textarea" style="margin-top:6px;min-height:60px;" placeholder="내용 (선택 — 클릭시 펼쳐짐)"></textarea>
+      <label style="display:flex;align-items:center;gap:6px;margin-top:8px;font-size:13px;cursor:pointer;color:#c0392b;">
+        <input type="checkbox" id="new-notice-important"> ★ 중요 공지로 표시
+      </label>
+      <button class="save-btn" style="margin-top:8px;" onclick="addNoticeItem()">추가</button>
+    </div>
+    <div class="save-error" id="notice-edit-error"></div>
+    <button class="close-btn" onclick="closeNoticeEditModal()">닫기</button>
+  </div>
+</div>
+
+<!-- 3학년부 팝업 -->
+<div class="overlay" id="g3-overlay" onclick="closeG3Panel(event)">
+  <div class="modal" style="max-width:500px;max-height:85vh;overflow-y:auto;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+      <div class="modal-title" style="margin:0;">📋 3학년부 일정 모아보기</div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div class="popup-font-ctrl">
+          <button class="popup-font-btn" onclick="popupFontChange('g3',-1)">가−</button>
+          <span class="popup-font-val" id="g3-font-val">100%</span>
+          <button class="popup-font-btn" onclick="popupFontChange('g3',1)">가+</button>
+        </div>
+        <button class="close-btn" style="width:auto;margin:0;padding:6px 14px;" onclick="closeG3PanelDirect()">닫기</button>
+      </div>
+    </div>
+    <div id="g3-list"></div>
+  </div>
+</div>
+
+<!-- 일정 상세/수정 모달 -->
+<div class="overlay" id="overlay" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-date"  id="modal-date"></div>
+    <div class="modal-title" id="modal-title"></div>
+    <div id="modal-body"></div>
+    <div id="modal-footer"></div>
+  </div>
+</div>
+
+<!-- 가정통신문 팝업 -->
+<div class="overlay" id="news-overlay" onclick="closeNewsPopup(event)">
+  <div class="modal" style="max-width:480px;max-height:85vh;overflow-y:auto;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+      <div class="modal-title" style="margin:0;">📄 가정통신문</div>
+      <button class="close-btn" style="width:auto;margin:0;padding:6px 14px;" onclick="document.getElementById('news-overlay').classList.remove('open')">닫기</button>
+    </div>
+    <div style="font-size:11px;color:#aaa;margin-bottom:10px;">클릭하면 학교 홈페이지로 이동해요</div>
+    <div id="news-list"><span class="neis-empty">불러오는 중...</span></div>
+  </div>
+</div>
+
+<!-- 급식 팝업 -->
+<div class="overlay" id="meal-overlay" onclick="closeMealPopup(event)">
+  <div class="modal" style="max-width:360px;max-height:85vh;overflow-y:auto;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+      <div class="modal-title" style="margin:0;">🍱 급식정보</div>
+      <button class="close-btn" style="width:auto;margin:0;padding:6px 14px;" onclick="document.getElementById('meal-overlay').classList.remove('open')">닫기</button>
+    </div>
+    <div class="neis-date-bar">
+      <button class="neis-date-btn" onclick="changeMealDate(-1)">◀</button>
+      <span class="neis-date-label" id="meal-date-label">오늘</span>
+      <button class="neis-date-btn" onclick="changeMealDate(1)">▶</button>
+      <button class="neis-date-btn" onclick="loadMeal(0)" style="color:#185FA5;">오늘</button>
+    </div>
+    <div class="neis-content" id="meal-content">
+      <span class="neis-empty">불러오는 중...</span>
+    </div>
+  </div>
+</div>
+
+<!-- 시간표 팝업 -->
+<div class="overlay" id="tt-overlay" onclick="closeTTPopup(event)">
+  <div class="modal" style="max-width:360px;max-height:85vh;overflow-y:auto;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+      <div class="modal-title" style="margin:0;">📅 시간표</div>
+      <button class="close-btn" style="width:auto;margin:0;padding:6px 14px;" onclick="document.getElementById('tt-overlay').classList.remove('open')">닫기</button>
+    </div>
+    <div class="neis-date-bar">
+      <button class="neis-date-btn" onclick="changeTTDate(-1)">◀</button>
+      <span class="neis-date-label" id="tt-date-label">오늘</span>
+      <button class="neis-date-btn" onclick="changeTTDate(1)">▶</button>
+      <button class="neis-date-btn" onclick="loadTimetable(ttOffset)" style="color:#185FA5;">오늘</button>
+    </div>
+    <div class="neis-class-select" id="tt-class-select"></div>
+    <div class="neis-content" id="tt-content">
+      <span class="neis-empty">반을 선택해주세요</span>
+    </div>
+  </div>
+</div>
+
+<!-- 공지 팝업 -->
+<div class="overlay" id="notice-popup-overlay" onclick="closeNoticePopup(event)">
+  <div class="modal" style="max-width:460px;">
+    <!-- 보기 모드 -->
+    <div id="notice-popup-view">
+      <div class="notice-popup-title" id="notice-popup-title"></div>
+      <div class="notice-popup-body" id="notice-popup-body"></div>
+      <div style="margin-top:16px;padding-top:12px;border-top:1px solid #f0efeb;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+        <label class="notice-done-check" id="notice-done-label">
+          <input type="checkbox" id="notice-done-check" onchange="toggleNoticeDone()"> ✅ 완료 (아래로 내리기)
+        </label>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="popup-font-ctrl">
+            <button class="popup-font-btn" onclick="popupFontChange('notice',-1)">가−</button>
+            <span class="popup-font-val" id="notice-font-val">100%</span>
+            <button class="popup-font-btn" onclick="popupFontChange('notice',1)">가+</button>
+          </div>
+          <button class="close-btn" style="width:auto;margin:0;padding:6px 14px;" onclick="openNoticePopupEdit()">✏️ 수정</button>
+          <button class="close-btn" style="width:auto;margin:0;padding:6px 14px;" onclick="closeNoticePopupDirect()">닫기</button>
+        </div>
+      </div>
+    </div>
+    <!-- 수정 모드 -->
+    <div id="notice-popup-edit" style="display:none;">
+      <div class="modal-label" style="margin-bottom:6px;">제목</div>
+      <input id="notice-popup-edit-title" class="modal-textarea" type="text"
+             style="min-height:unset;height:38px;resize:none;margin-bottom:10px;" />
+      <div class="modal-label" style="margin-bottom:6px;">내용</div>
+      <textarea id="notice-popup-edit-content" class="modal-textarea" style="min-height:100px;"></textarea>
+      <label style="display:flex;align-items:center;gap:6px;margin-top:10px;font-size:13px;cursor:pointer;color:#c0392b;">
+        <input type="checkbox" id="notice-popup-edit-important"> ★ 중요 공지로 표시
+      </label>
+      <div class="save-error" id="notice-popup-edit-error"></div>
+      <div style="display:flex;gap:8px;margin-top:12px;">
+        <button class="save-btn" style="flex:1;" onclick="saveNoticePopupEdit()">저장</button>
+        <button class="close-btn" style="flex:1;margin:0;" onclick="closeNoticePopupEdit()">취소</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 🎲 도구 전체화면 -->
+<div id="toolbox-overlay" style="
+  display:none; position:fixed; inset:0; z-index:9999;
+  background:#0d0d1a; font-family:'Noto Sans KR',sans-serif;
+  flex-direction:column; overflow:hidden;
+">
+  <!-- 헤더 -->
+  <div style="display:flex;align-items:center;justify-content:space-between;
+    padding:14px 24px; background:#0d0d1a; border-bottom:1px solid #1e1e3a; flex-shrink:0;">
+    <div style="display:flex;gap:6px;">
+      <button onclick="switchTool('stopwatch')" id="tab-stopwatch" class="tool-tab active">⏱ 스톱워치</button>
+      <button onclick="switchTool('timer')"     id="tab-timer"     class="tool-tab">⏲ 타이머</button>
+      <button onclick="switchTool('ladder')"    id="tab-ladder"    class="tool-tab">🪜 사다리</button>
+      <button onclick="switchTool('lottery')"   id="tab-lottery"   class="tool-tab">🎋 제비뽑기</button>
+      <button onclick="switchTool('qr')"        id="tab-qr"        class="tool-tab">📱 QR코드</button>
+    </div>
+    <button onclick="closeToolbox()" style="background:none;border:none;color:#555;font-size:24px;cursor:pointer;padding:4px 10px;border-radius:6px;line-height:1;">✕</button>
+  </div>
+
+  <!-- 콘텐츠 -->
+  <div style="flex:1;overflow-y:auto;display:flex;align-items:center;justify-content:center;min-height:0;padding:12px 0;">
+
+    <!-- ⏱ 스톱워치 (다크, 시계 최대화) -->
+    <div id="tool-stopwatch" class="tool-panel">
+      <div id="sw-display" style="
+        font-size:clamp(100px,22vw,260px); font-weight:700; color:#fff;
+        letter-spacing:0.04em; font-variant-numeric:tabular-nums;
+        text-shadow:0 0 80px rgba(100,180,255,0.5);
+        line-height:1; margin-bottom:8px;">00:00.00</div>
+      <div id="sw-sub" style="font-size:clamp(16px,2vw,22px);color:#334;margin-bottom:40px;min-height:28px;"></div>
+      <div style="display:flex;gap:16px;">
+        <button onclick="swToggle()" id="sw-btn-start" class="tool-btn primary" style="min-width:130px;font-size:18px;">시작</button>
+        <button onclick="swLap()"    id="sw-btn-lap"   class="tool-btn secondary" style="min-width:110px;font-size:18px;">랩</button>
+        <button onclick="swReset()"                    class="tool-btn ghost"     style="min-width:110px;font-size:18px;">초기화</button>
+      </div>
+      <div id="sw-laps" style="margin-top:28px;max-height:160px;overflow-y:auto;width:360px;border-radius:10px;"></div>
+    </div>
+
+    <!-- ⏲ 타이머 (다크, 시계 최대화) -->
+    <div id="tool-timer" class="tool-panel" style="display:none;">
+      <div id="timer-display" style="
+        font-size:clamp(100px,22vw,260px); font-weight:700; color:#fff;
+        letter-spacing:0.04em; font-variant-numeric:tabular-nums;
+        text-shadow:0 0 80px rgba(255,160,80,0.5);
+        line-height:1; margin-bottom:40px; transition:color 0.3s;">00:00</div>
+      <div id="timer-input-wrap" style="display:flex;gap:14px;margin-bottom:32px;align-items:center;">
+        <div style="text-align:center;">
+          <input id="timer-h" type="number" min="0" max="99" value="0" class="timer-input">
+          <div style="font-size:13px;color:#444;margin-top:6px;">시간</div>
+        </div>
+        <div style="font-size:36px;color:#333;margin-bottom:20px;">:</div>
+        <div style="text-align:center;">
+          <input id="timer-m" type="number" min="0" max="59" value="5" class="timer-input">
+          <div style="font-size:13px;color:#444;margin-top:6px;">분</div>
+        </div>
+        <div style="font-size:36px;color:#333;margin-bottom:20px;">:</div>
+        <div style="text-align:center;">
+          <input id="timer-s" type="number" min="0" max="59" value="0" class="timer-input">
+          <div style="font-size:13px;color:#444;margin-top:6px;">초</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:16px;">
+        <button onclick="timerToggle()" id="timer-btn-start" class="tool-btn primary" style="min-width:130px;font-size:18px;">시작</button>
+        <button onclick="timerReset()"                       class="tool-btn ghost"   style="min-width:110px;font-size:18px;">초기화</button>
+      </div>
+      <div id="timer-done" style="display:none;margin-top:28px;font-size:28px;color:#ff6b6b;font-weight:700;animation:pulse 0.8s infinite;">⏰ 시간 종료!</div>
+    </div>
+
+    <!-- 🪜 사다리타기 (밝은 테마) -->
+    <div id="tool-ladder" class="tool-panel-light" style="display:none;width:100%;max-width:1100px;padding:32px 32px;">
+      <div id="ladder-setup">
+        <div style="text-align:center;font-size:22px;font-weight:700;color:#1a1a1a;margin-bottom:20px;">🪜 사다리타기</div>
+        <div style="display:flex;gap:14px;">
+          <div style="flex:1;">
+            <div style="font-size:12px;font-weight:700;color:#888;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.05em;">참가자</div>
+            <textarea id="ladder-players" class="tool-textarea-light" placeholder="홍길동&#10;김철수&#10;이영희&#10;박민준" style="height:160px;"></textarea>
+          </div>
+          <div style="flex:1;">
+            <div style="font-size:12px;font-weight:700;color:#888;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.05em;">결과</div>
+            <textarea id="ladder-results" class="tool-textarea-light" placeholder="당첨&#10;꽝&#10;1등&#10;2등" style="height:160px;"></textarea>
+          </div>
+        </div>
+        <button onclick="startLadder()" class="tool-btn-light" style="margin-top:16px;width:100%;font-size:16px;padding:14px;">🚀 사다리 시작!</button>
+      </div>
+      <div id="ladder-canvas-wrap" style="display:none;text-align:center;">
+        <canvas id="ladder-canvas" style="max-width:100%;border-radius:16px;box-shadow:0 4px 30px rgba(0,0,0,0.1);background:#fff;"></canvas>
+        <div style="display:flex;gap:10px;justify-content:center;margin-top:20px;">
+          <button onclick="revealNextResult()" id="ladder-btn-next" class="tool-btn-light" style="padding:10px 24px;font-size:14px;">👆 한명씩 보기</button>
+          <button onclick="revealAllResults()"  id="ladder-btn-all"  class="tool-btn-light" style="padding:10px 24px;font-size:14px;background:#228855;">🎯 한번에 보기</button>
+          <button onclick="resetLadder()"                             class="tool-btn-ghost-light" style="padding:10px 20px;font-size:14px;">↩ 다시</button>
+        </div>
+        <div id="ladder-result-list" style="margin-top:16px;display:flex;flex-wrap:wrap;gap:8px;justify-content:center;"></div>
+      </div>
+    </div>
+
+    <!-- 🎋 제비뽑기 (밝은 테마) -->
+    <div id="tool-lottery" class="tool-panel-light" style="display:none;width:100%;max-width:720px;padding:36px 40px;">
+      <div id="lottery-setup">
+        <div style="text-align:center;font-size:22px;font-weight:700;color:#1a1a1a;margin-bottom:20px;">🎋 제비뽑기</div>
+        <div style="font-size:12px;font-weight:700;color:#888;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.05em;">참가자 목록</div>
+        <textarea id="lottery-names" class="tool-textarea-light" placeholder="홍길동&#10;김철수&#10;이영희&#10;또는 숫자 범위: 1-30" style="height:130px;"></textarea>
+        <div style="display:flex;align-items:center;gap:14px;margin-top:14px;">
+          <div style="font-size:14px;color:#555;white-space:nowrap;">뽑을 인원</div>
+          <input id="lottery-count" type="number" min="1" value="1" class="timer-input-light" style="width:80px;">
+          <label style="font-size:13px;color:#555;display:flex;align-items:center;gap:6px;cursor:pointer;">
+            <input type="checkbox" id="lottery-no-dup" checked style="width:16px;height:16px;"> 중복 없음
+          </label>
+        </div>
+        <button onclick="startLottery()" class="tool-btn-light" style="margin-top:16px;width:100%;font-size:16px;padding:14px;">🎯 추첨 시작!</button>
+      </div>
+      <div id="lottery-spinning" style="display:none;text-align:center;padding:20px 0;">
+        <div id="lottery-spin-display" style="font-size:clamp(100px,18vw,220px);font-weight:900;color:#1a1a1a;
+          animation:spinPick 0.08s infinite;min-height:180px;line-height:1;letter-spacing:-0.02em;"></div>
+        <div style="margin-top:16px;font-size:16px;color:#aaa;font-weight:500;">추첨 중...</div>
+      </div>
+      <div id="lottery-result" style="display:none;text-align:center;">
+        <div style="font-size:15px;color:#888;margin-bottom:20px;">🎉 추첨 결과</div>
+        <div id="lottery-result-list" style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-bottom:28px;"></div>
+        <button onclick="resetLottery()" class="tool-btn-ghost-light">↩ 다시 뽑기</button>
+      </div>
+    </div>
+
+
+    <!-- 📱 QR코드 -->
+    <div id="tool-qr" class="tool-panel-light" style="display:none;width:100%;max-width:600px;padding:36px 40px;">
+      <div style="text-align:center;font-size:22px;font-weight:700;color:#1a1a1a;margin-bottom:24px;">📱 QR코드 생성</div>
+      <div style="font-size:12px;font-weight:700;color:#888;margin-bottom:6px;letter-spacing:0.05em;">URL 또는 텍스트 입력</div>
+      <textarea id="qr-input" class="tool-textarea-light" style="height:80px;font-size:15px;"
+        placeholder="https://chemistry12.github.io/viveon/"></textarea>
+      <div style="display:flex;gap:10px;margin-top:12px;">
+        <button onclick="generateQR()" class="tool-btn-light" style="flex:1;font-size:15px;padding:12px;">QR 생성</button>
+        <button onclick="resetQR()" class="tool-btn-ghost-light" style="padding:12px 20px;font-size:14px;">초기화</button>
+      </div>
+      <!-- 미리보기 -->
+      <div id="qr-preview-wrap" style="display:none;margin-top:28px;text-align:center;">
+        <div style="font-size:12px;font-weight:700;color:#888;margin-bottom:12px;letter-spacing:0.05em;">미리보기</div>
+        <div id="qr-canvas-wrap" style="display:inline-block;padding:20px;background:#fff;border-radius:16px;box-shadow:0 4px 20px rgba(0,0,0,0.1);">
+          <div id="qr-canvas"></div>
+        </div>
+        <div style="margin-top:20px;font-size:12px;color:#aaa;word-break:break-all;padding:0 8px;" id="qr-url-label"></div>
+        <div style="display:flex;gap:10px;margin-top:16px;justify-content:center;">
+          <button onclick="downloadQR()" class="tool-btn-light" style="font-size:14px;padding:10px 24px;">⬇ PNG 다운로드</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- 색상 설정 모달 -->
+<div class="overlay" id="color-overlay" onclick="closeColorModal(event)">
+  <div class="modal color-modal">
+    <div class="modal-title">색상 설정</div>
+    <div id="color-body"></div>
+    <button class="color-reset-btn" onclick="resetColors()">기본값으로 초기화</button>
+    <button class="close-btn" onclick="closeColorModal()">닫기</button>
+  </div>
+</div>
+
+<script>
+const API_URL = 'https://script.google.com/macros/s/AKfycbwt88IWEiKk6PZm9Myqcy_i8qSwg6FgtdC8oHa0Q2nGlRstYaSwKz1gryJrDMmKHn-d/exec';
+
+const MONTHS = [
+  {y:2026,m:2,label:"2026년 3월"},{y:2026,m:3,label:"2026년 4월"},{y:2026,m:4,label:"2026년 5월"},
+  {y:2026,m:5,label:"2026년 6월"},{y:2026,m:6,label:"2026년 7월"},{y:2026,m:7,label:"2026년 8월"},
+  {y:2026,m:8,label:"2026년 9월"},{y:2026,m:9,label:"2026년 10월"},{y:2026,m:10,label:"2026년 11월"},
+  {y:2026,m:11,label:"2026년 12월"},{y:2027,m:0,label:"2027년 1월"},
+];
+const WEEKDAYS = ["일","월","화","수","목","금","토"];
+let EVENT_MAP = {}, LINKS = [], NOTICES = [];
+let currentKey = '';
+
+// ── 색상 ──────────────────────────────────────
+const DEFAULT_COLORS = {
+  '--color-g3-bg':'#d6eaf8','--color-g3-item':'#E6F1FB','--color-g3-text':'#0C447C',
+  '--color-school-bg':'#eeede7','--color-school-item':'#E8E6DF','--color-school-text':'#444444',
+  '--color-exam-bg':'#FAECE7','--color-exam-text':'#712B13',
+  '--color-holiday-bg':'#FCEBEB','--color-holiday-text':'#A32D2D',
+  '--color-sun-bg':'#fff5f5','--color-sat-bg':'#f4f7ff',
+  '--color-dow-sun':'#c0392b','--color-dow-sat':'#1a5fa8',
+  '--color-today-border':'#E24B4A','--color-today-num':'#185FA5',
+};
+const COLOR_LABELS = {
+  '--color-g3-bg':'3학년부 섹션 배경','--color-g3-item':'3학년부 항목 배경','--color-g3-text':'3학년부 글자색',
+  '--color-school-bg':'학교일정 섹션 배경','--color-school-item':'학교일정 항목 배경','--color-school-text':'학교일정 글자색',
+  '--color-exam-bg':'시험·모평 배경','--color-exam-text':'시험·모평 글자색',
+  '--color-holiday-bg':'공휴일 배경','--color-holiday-text':'공휴일 글자색',
+  '--color-sun-bg':'일요일 칸 배경','--color-sat-bg':'토요일 칸 배경',
+  '--color-dow-sun':'일 요일 헤더','--color-dow-sat':'토 요일 헤더',
+  '--color-today-border':'오늘 테두리','--color-today-num':'오늘 날짜 원',
+};
+function loadColors() {
+  const saved = localStorage.getItem('cal-colors');
+  const colors = saved ? {...DEFAULT_COLORS,...JSON.parse(saved)} : DEFAULT_COLORS;
+  Object.entries(colors).forEach(([k,v]) => document.documentElement.style.setProperty(k,v));
+}
+function saveColor(v,val) {
+  const saved = JSON.parse(localStorage.getItem('cal-colors')||'{}');
+  saved[v]=val; localStorage.setItem('cal-colors',JSON.stringify(saved));
+  document.documentElement.style.setProperty(v,val);
+}
+function resetColors() {
+  localStorage.removeItem('cal-colors');
+  Object.entries(DEFAULT_COLORS).forEach(([k,v]) => document.documentElement.style.setProperty(k,v));
+  openColorModal();
+}
+function openColorModal() {
+  const saved = JSON.parse(localStorage.getItem('cal-colors')||'{}');
+  const cur = {...DEFAULT_COLORS,...saved};
+  document.getElementById('color-body').innerHTML = Object.entries(COLOR_LABELS).map(([vn,label]) =>
+    `<div class="color-row"><span>${label}</span><input type="color" value="${cur[vn]}" onchange="saveColor('${vn}',this.value)"/></div>`
+  ).join('');
+  document.getElementById('color-overlay').classList.add('open');
+}
+function closeColorModal(e) {
+  if(!e||e.target===document.getElementById('color-overlay'))
+    document.getElementById('color-overlay').classList.remove('open');
+}
+
+// ── 상태 ──────────────────────────────────────
+function setStatus(state, text) {
+  document.getElementById('status-dot').className = 'status-dot ' + state;
+  document.getElementById('status-text').textContent = text;
+}
+
+// ── 데이터 로드 ───────────────────────────────
+async function loadData() {
+  setStatus('','데이터 불러오는 중...');
+  try {
+    const res  = await fetch(API_URL);
+    const data = await res.json();
+
+    // 일정
+    EVENT_MAP = {};
+    const rows = data.schedule || data;
+    rows.forEach(row => {
+      const dateVal = row['날짜'];
+      if (!dateVal) return;
+      EVENT_MAP[String(dateVal).substring(0,10)] = {
+        school: row['일정(학교)']    || '',
+        g3:     row['일정(3학년부)'] || '',
+      };
+    });
+
+    // 링크
+    LINKS = data.links || [];
+    renderLinks();
+
+    // 공지사항
+    NOTICES = data.notices || [];
+    renderNotices();
+
+    // 3학년부 요약
+    renderSummary();
+
+    const now = new Date().toLocaleString('ko-KR',{timeZone:'Asia/Seoul',hour:'2-digit',minute:'2-digit'});
+    setStatus('ok', now + ' 기준 최신 데이터');
+    // 설정 복원 (상태만, buildCalendar 없음) → buildCalendar 1번만 실행
+    loadSettings();
+    buildCalendar();
+    if (isMobile()) {
+      initMobile();
+      showPageMonth();
+      renderMobileEvents();
+      document.getElementById('mobile-month-label').textContent = MONTHS[pageIdx].label;
+      setTimeout(renderMobilePanels, 100);
+    } else {
+      if (currentNavMode === 'page') showPageMonth();
+      else setTimeout(scrollToToday, 100);
+    }
+  } catch(e) {
+    setStatus('err','불러오기 실패 — 새로고침을 눌러주세요');
+  }
+}
+
+// ── 링크 렌더링 ───────────────────────────────
+function renderLinks() {
+  const grid = document.getElementById('link-grid');
+  if (!LINKS.length) {
+    grid.innerHTML = '<span style="font-size:12px;color:#aaa;">등록된 링크가 없습니다.</span>';
+    return;
+  }
+  grid.innerHTML = LINKS.map(lk =>
+    `<a class="link-item" href="${lk.url}" target="_blank" rel="noopener">${lk.title}</a>`
+  ).join('');
+}
+
+// ── 공지 렌더링 ───────────────────────────────
+// 읽음 공지 저장 (localStorage)
+function getNoticeDoneSet() {
+  return new Set(JSON.parse(localStorage.getItem('notice-done') || '[]'));
+}
+function saveNoticeDoneSet(s) {
+  localStorage.setItem('notice-done', JSON.stringify([...s]));
+}
+
+function renderNotices() {
+  const list = document.getElementById('notice-list');
+  if (!NOTICES.length) {
+    list.innerHTML = '<span class="notice-empty">등록된 공지사항이 없습니다.</span>';
+    return;
+  }
+  const doneSet = getNoticeDoneSet();
+  const sorted = NOTICES.map((n,i) => ({n,i})).sort((a,b) => {
+    // 중요 먼저, 완료 나중
+    if (a.n.important && !b.n.important) return -1;
+    if (!a.n.important && b.n.important) return 1;
+    const aDone = doneSet.has(String(a.i));
+    const bDone = doneSet.has(String(b.i));
+    return aDone === bDone ? 0 : aDone ? 1 : -1;
+  });
+  list.innerHTML = sorted.map(({n,i}) => {
+    const done = doneSet.has(String(i));
+    const imp  = n.important;
+    return `<div class="notice-item${done?' done':''}${imp?' important':''}" id="notice-${i}" onclick="openNoticePopup(${i})" style="cursor:pointer;">
+      <div class="notice-title-row">
+        ${imp ? '<span style="color:#E24B4A;font-size:14px;flex-shrink:0;">★</span>' : '<div class="notice-dot"></div>'}
+        <span class="notice-title-text" style="${imp?'color:#c0392b;font-weight:700;':''}${done?'text-decoration:line-through;color:#bbb;':''}">${n.title}</span>
+        ${n.content && n.content.trim() ? '<span class="notice-arrow">›</span>' : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+let currentNoticeIdx = -1;
+function openNoticePopup(i) {
+  currentNoticeIdx = i;
+  const n = NOTICES[i];
+  document.getElementById('notice-popup-title').textContent = n.title;
+  document.getElementById('notice-popup-body').textContent  = n.content || '(내용 없음)';
+  const doneSet = getNoticeDoneSet();
+  document.getElementById('notice-done-check').checked = doneSet.has(String(i));
+  document.getElementById('notice-popup-overlay').classList.add('open');
+}
+function openNoticePopupEdit() {
+  const n = NOTICES[currentNoticeIdx];
+  document.getElementById('notice-popup-edit-title').value   = n.title;
+  document.getElementById('notice-popup-edit-content').value = n.content || '';
+  document.getElementById('notice-popup-edit-important').checked = n.important || false;
+  document.getElementById('notice-popup-edit-error').textContent = '';
+  document.getElementById('notice-popup-view').style.display = 'none';
+  document.getElementById('notice-popup-edit').style.display = 'block';
+}
+function closeNoticePopupEdit() {
+  document.getElementById('notice-popup-edit').style.display = 'none';
+  document.getElementById('notice-popup-view').style.display = 'block';
+}
+async function saveNoticePopupEdit() {
+  const title     = document.getElementById('notice-popup-edit-title').value.trim();
+  const content   = document.getElementById('notice-popup-edit-content').value.trim();
+  const important = document.getElementById('notice-popup-edit-important').checked;
+  const err       = document.getElementById('notice-popup-edit-error');
+  if (!title) { err.textContent = '제목을 입력해주세요.'; return; }
+  err.textContent = '저장 중...';
+  try {
+    await fetch(API_URL, { method:'POST', body: JSON.stringify({
+      type:'notice', action:'edit', index: currentNoticeIdx, title, content, important
+    })});
+    NOTICES[currentNoticeIdx] = { ...NOTICES[currentNoticeIdx], title, content, important };
+    // 팝업 보기 모드 내용 갱신
+    document.getElementById('notice-popup-title').textContent = title;
+    document.getElementById('notice-popup-body').textContent  = content || '(내용 없음)';
+    renderNotices();
+    closeNoticePopupEdit();
+    err.textContent = '';
+  } catch(e) { err.textContent = '저장 실패. 다시 시도해주세요.'; }
+}
+function closeNoticePopupDirect() {
+  document.getElementById('notice-popup-overlay').classList.remove('open');
+}
+function toggleNoticeDone() {
+  const checked = document.getElementById('notice-done-check').checked;
+  const doneSet = getNoticeDoneSet();
+  if (checked) doneSet.add(String(currentNoticeIdx));
+  else doneSet.delete(String(currentNoticeIdx));
+  saveNoticeDoneSet(doneSet);
+  renderNotices();
+}
+
+// ── 3학년부 요약 렌더링 (전체, 앞으로 일정) ──
+function renderSummary() {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const list = document.getElementById('summary-list');
+  const DOW = ["일","월","화","수","목","금","토"];
+  const items = Object.entries(EVENT_MAP)
+    .filter(([k,ev]) => ev.g3 && ev.g3.trim() && new Date(k) >= today)
+    .sort((a,b) => a[0].localeCompare(b[0]));
+  if (!items.length) {
+    list.innerHTML = '<span class="g3-empty">앞으로 예정된 3학년부 일정이 없습니다.</span>';
+    return;
+  }
+  list.innerHTML = items.map(([k,ev]) => {
+    const d = new Date(k);
+    const [y,m,day] = k.split('-');
+    const lines = ev.g3.split('\n').filter(s=>s.trim());
+    return `<div class="g3-item" onclick="jumpToDate('${k}')">
+      <div class="g3-date-col">
+        <div class="g3-date">${parseInt(m)}월 ${parseInt(day)}일</div>
+        <div class="g3-dow">${y}년 ${DOW[d.getDay()]}요일</div>
+      </div>
+      <div class="g3-content">
+        <span class="g3-tag">3학년부</span>
+        <div class="g3-text">${lines.join('<br>')}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+// ── 링크 수정 모달 ────────────────────────────
+function openLinkEditModal() {
+  renderLinkEditList();
+  document.getElementById('link-edit-overlay').classList.add('open');
+}
+function closeLinkEditModal(e) {
+  if(!e||e.target===document.getElementById('link-edit-overlay'))
+    document.getElementById('link-edit-overlay').classList.remove('open');
+}
+function renderLinkEditList() {
+  const el = document.getElementById('link-edit-list');
+  if (!LINKS.length) { el.innerHTML='<div style="font-size:12px;color:#aaa;margin-bottom:8px;">등록된 링크가 없습니다.</div>'; return; }
+  el.innerHTML = LINKS.map((lk,i) =>
+    `<div style="padding:8px 0;border-bottom:1px solid #f0efeb;">
+      <div style="display:flex;align-items:center;gap:6px;">
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:13px;color:#0C447C;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${lk.title}</div>
+          <div style="font-size:11px;color:#aaa;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${lk.url}</div>
+        </div>
+        <button onclick="toggleLinkEdit(${i})" style="background:none;border:1px solid #ddd;border-radius:5px;cursor:pointer;font-size:12px;padding:3px 8px;color:#555;white-space:nowrap;flex-shrink:0;">✏️ 수정</button>
+        <button onclick="deleteLinkItem(${i})" style="background:none;border:1px solid #E24B4A;border-radius:5px;cursor:pointer;font-size:12px;padding:3px 8px;color:#E24B4A;white-space:nowrap;flex-shrink:0;">× 삭제</button>
+      </div>
+      <div id="link-edit-form-${i}" style="display:none;margin-top:8px;">
+        <input id="link-edit-title-${i}" class="modal-textarea" type="text" value="${lk.title}"
+               style="min-height:unset;height:34px;resize:none;margin-bottom:4px;" placeholder="제목" />
+        <input id="link-edit-url-${i}" class="modal-textarea" type="text" value="${lk.url}"
+               style="min-height:unset;height:34px;resize:none;margin-bottom:6px;" placeholder="URL" />
+        <button onclick="saveLinkEdit(${i})" class="save-btn" style="padding:4px 14px;margin-right:4px;">저장</button>
+        <button onclick="toggleLinkEdit(${i})" style="background:none;border:1px solid #ddd;border-radius:6px;padding:4px 12px;cursor:pointer;font-size:12px;">취소</button>
+      </div>
+    </div>`
+  ).join('');
+}
+function toggleLinkEdit(i) {
+  const form = document.getElementById('link-edit-form-'+i);
+  form.style.display = form.style.display === 'none' ? 'block' : 'none';
+}
+async function saveLinkEdit(i) {
+  const title = document.getElementById('link-edit-title-'+i).value.trim();
+  const url   = document.getElementById('link-edit-url-'+i).value.trim();
+  const err   = document.getElementById('link-edit-error');
+  if (!title || !url) { err.textContent='제목과 URL을 입력해주세요.'; return; }
+  err.textContent='저장 중...';
+  try {
+    await fetch(API_URL,{method:'POST',body:JSON.stringify({type:'link',action:'edit',index:i,title,url})});
+    LINKS[i] = {title, url};
+    renderLinks(); renderLinkEditList();
+    err.textContent='';
+  } catch(e) { err.textContent='저장 실패'; }
+}
+async function addLinkItem() {
+  const title = document.getElementById('new-link-title').value.trim();
+  const url   = document.getElementById('new-link-url').value.trim();
+  const err   = document.getElementById('link-edit-error');
+  if (!title) { err.textContent='제목을 입력해주세요.'; return; }
+  if (!url||(!url.startsWith('http://')&&!url.startsWith('https://'))) { err.textContent='올바른 URL을 입력해주세요.'; return; }
+  err.textContent='저장 중...';
+  try {
+    await fetch(API_URL,{method:'POST',body:JSON.stringify({type:'link',action:'add',title,url})});
+    LINKS.push({title,url});
+    renderLinks(); renderLinkEditList();
+    document.getElementById('new-link-title').value='';
+    document.getElementById('new-link-url').value='';
+    err.textContent='';
+  } catch(e) { err.textContent='저장 실패. 구글 시트에서 직접 추가해주세요.'; }
+}
+async function deleteLinkItem(idx) {
+  if (!confirm(`"${LINKS[idx].title}" 링크를 삭제할까요?`)) return;
+  const err = document.getElementById('link-edit-error');
+  err.textContent='저장 중...';
+  try {
+    await fetch(API_URL,{method:'POST',body:JSON.stringify({type:'link',action:'delete',index:idx})});
+    LINKS.splice(idx,1);
+    renderLinks(); renderLinkEditList();
+    err.textContent='';
+  } catch(e) { err.textContent='삭제 실패. 구글 시트에서 직접 삭제해주세요.'; }
+}
+
+// ── 공지 수정 모달 ────────────────────────────
+function openNoticeEditModal() {
+  renderNoticeEditList();
+  document.getElementById('notice-edit-overlay').classList.add('open');
+}
+function closeNoticeEditModal(e) {
+  if(!e||e.target===document.getElementById('notice-edit-overlay'))
+    document.getElementById('notice-edit-overlay').classList.remove('open');
+}
+function renderNoticeEditList() {
+  const el = document.getElementById('notice-edit-list');
+  if (!NOTICES.length) { el.innerHTML='<div style="font-size:12px;color:#aaa;margin-bottom:8px;">등록된 공지가 없습니다.</div>'; return; }
+  el.innerHTML = NOTICES.map((n,i) =>
+    `<div style="padding:8px 0;border-bottom:1px solid #f0efeb;">
+      <div style="display:flex;align-items:flex-start;gap:6px;">
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:500;color:${n.important?'#c0392b':'#1a1a1a'};">
+            ${n.important?'★ ':''}${n.title}
+          </div>
+          ${n.content ? `<div style="font-size:12px;color:#888;margin-top:2px;white-space:pre-line;">${n.content}</div>` : ''}
+        </div>
+        <button onclick="toggleNoticeImportant(${i})" title="중요 공지 설정"
+          style="background:none;border:none;cursor:pointer;font-size:15px;padding:0 3px;color:${n.important?'#E24B4A':'#ccc'};">★</button>
+        <button onclick="toggleNoticeEditForm(${i})" style="background:none;border:none;cursor:pointer;font-size:13px;padding:2px 5px;color:#555;">✏️</button>
+        <button onclick="deleteNoticeItem(${i})" style="background:none;border:none;cursor:pointer;color:#E24B4A;font-size:16px;padding:0 4px;flex-shrink:0;">×</button>
+      </div>
+      <div id="notice-edit-form-${i}" style="display:none;margin-top:8px;">
+        <input id="notice-edit-title-${i}" class="modal-textarea" type="text" value="${n.title}"
+               style="min-height:unset;height:34px;resize:none;margin-bottom:4px;" />
+        <textarea id="notice-edit-content-${i}" class="modal-textarea"
+                  style="min-height:50px;margin-bottom:4px;">${n.content||''}</textarea>
+        <button onclick="saveNoticeEdit(${i})" class="save-btn" style="padding:4px 12px;margin-right:4px;">저장</button>
+        <button onclick="toggleNoticeEditForm(${i})" style="background:none;border:1px solid #ddd;border-radius:6px;padding:4px 12px;cursor:pointer;font-size:12px;">취소</button>
+      </div>
+    </div>`
+  ).join('');
+}
+function toggleNoticeEditForm(i) {
+  const form = document.getElementById('notice-edit-form-'+i);
+  form.style.display = form.style.display === 'none' ? 'block' : 'none';
+}
+async function saveNoticeEdit(i) {
+  const title   = document.getElementById('notice-edit-title-'+i).value.trim();
+  const content = document.getElementById('notice-edit-content-'+i).value.trim();
+  const err = document.getElementById('notice-edit-error');
+  if (!title) { err.textContent='제목을 입력해주세요.'; return; }
+  err.textContent='저장 중...';
+  try {
+    await fetch(API_URL,{method:'POST',body:JSON.stringify({
+      type:'notice',action:'edit',index:i,title,content,important:NOTICES[i].important||false
+    })});
+    NOTICES[i] = {...NOTICES[i], title, content};
+    renderNotices(); renderNoticeEditList();
+    err.textContent='';
+  } catch(e) { err.textContent='저장 실패'; }
+}
+async function toggleNoticeImportant(i) {
+  const err = document.getElementById('notice-edit-error');
+  const imp = !NOTICES[i].important;
+  err.textContent='저장 중...';
+  try {
+    await fetch(API_URL,{method:'POST',body:JSON.stringify({
+      type:'notice',action:'edit',index:i,
+      title:NOTICES[i].title,content:NOTICES[i].content||'',important:imp
+    })});
+    NOTICES[i].important = imp;
+    renderNotices(); renderNoticeEditList();
+    err.textContent='';
+  } catch(e) { err.textContent='저장 실패'; }
+}
+async function addNoticeItem() {
+  const title     = document.getElementById('new-notice-title').value.trim();
+  const content   = document.getElementById('new-notice-content').value.trim();
+  const important = document.getElementById('new-notice-important').checked;
+  const err = document.getElementById('notice-edit-error');
+  if (!title) { err.textContent='제목을 입력해주세요.'; return; }
+  err.textContent='저장 중...';
+  try {
+    await fetch(API_URL,{method:'POST',body:JSON.stringify({type:'notice',action:'add',title,content,important})});
+    NOTICES.push({title,content,important});
+    renderNotices(); renderNoticeEditList();
+    document.getElementById('new-notice-content').value='';
+    err.textContent='';
+  } catch(e) { err.textContent='저장 실패. 구글 시트에서 직접 추가해주세요.'; }
+}
+async function deleteNoticeItem(idx) {
+  if (!confirm('이 공지를 삭제할까요?')) return;
+  const err = document.getElementById('notice-edit-error');
+  err.textContent='저장 중...';
+  try {
+    await fetch(API_URL,{method:'POST',body:JSON.stringify({type:'notice',action:'delete',index:idx})});
+    NOTICES.splice(idx,1);
+    renderNotices(); renderNoticeEditList();
+    err.textContent='';
+  } catch(e) { err.textContent='삭제 실패. 구글 시트에서 직접 삭제해주세요.'; }
+}
+
+// ── 검색 ──────────────────────────────────────
+let searchTimer=null, searchMatches=[], searchIndex=-1;
+
+function onSearch(val) {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => doSearch(val.trim()), 200);
+  document.getElementById('search-clear').classList.toggle('visible', val.length>0);
+}
+function doSearch(query) {
+  const cells = document.querySelectorAll('.day-cell:not(.empty)');
+  const bar = document.getElementById('search-result-bar');
+  const nav = document.getElementById('search-nav');
+  searchMatches=[]; searchIndex=-1;
+  if (!query) {
+    cells.forEach(c=>c.classList.remove('search-match','search-dim','search-focus'));
+    bar.classList.remove('visible'); nav.classList.remove('visible'); return;
+  }
+  const q = query.toLowerCase();
+  cells.forEach(c => {
+    const ev = EVENT_MAP[c.dataset.key]||{};
+    const text = ((ev.school||'')+' '+(ev.g3||'')).toLowerCase();
+    if (text.includes(q)) {
+      c.classList.add('search-match'); c.classList.remove('search-dim','search-focus');
+      searchMatches.push(c);
+    } else {
+      c.classList.remove('search-match','search-focus'); c.classList.add('search-dim');
+    }
+  });
+  if (searchMatches.length>0) { searchIndex=0; focusMatch(); nav.classList.add('visible'); }
+  else nav.classList.remove('visible');
+  updateNavInfo();
+  bar.textContent=`"${query}" 검색 결과 ${searchMatches.length}건`;
+  bar.classList.toggle('visible', searchMatches.length>0);
+}
+function focusMatch() {
+  searchMatches.forEach(c=>c.classList.remove('search-focus'));
+  const target = searchMatches[searchIndex];
+  if (!target) { updateNavInfo(); return; }
+
+  // 페이지 모드: 해당 셀이 속한 달로 먼저 전환
+  if (currentNavMode === 'page') {
+    const key = target.dataset.key; // "YYYY-MM-DD"
+    const [ty, tm] = key.split('-').map(Number);
+    const idx = MONTHS.findIndex(mo => mo.y === ty && mo.m === tm - 1);
+    if (idx >= 0 && idx !== pageIdx) {
+      pageIdx = idx;
+      document.getElementById('page-nav-label').textContent = MONTHS[pageIdx].label;
+      showPageMonth();
+    }
+  }
+
+  target.classList.add('search-focus');
+  setTimeout(() => target.scrollIntoView({behavior:'smooth', block:'center'}), 80);
+  updateNavInfo();
+}
+function searchNext() { if(!searchMatches.length)return; searchIndex=(searchIndex+1)%searchMatches.length; focusMatch(); }
+function searchPrev() { if(!searchMatches.length)return; searchIndex=(searchIndex-1+searchMatches.length)%searchMatches.length; focusMatch(); }
+function updateNavInfo() {
+  const info=document.getElementById('search-nav-info');
+  info.textContent = searchMatches.length===0 ? '0/0' : `${searchIndex+1}/${searchMatches.length}`;
+}
+function clearSearch() {
+  document.getElementById('search-input').value='';
+  document.getElementById('search-clear').classList.remove('visible');
+  doSearch('');
+}
+
+// ── 공휴일 ────────────────────────────────────
+const HOLIDAY_KEYWORDS=['공휴일','선거일','개교기념일','휴업일','휴무일','어린이날','노동절','신정','성탄절','한글날','제헌절','추석','추석 연휴','수학능력 시험일','학교장 재량휴업일','대체 휴업일','대체 휴무일'];
+function isHoliday(s)     { return s.split('\n').some(l=>HOLIDAY_KEYWORDS.includes(l.trim())); }
+function getHolidayName(s){ const l=s.split('\n').find(l=>HOLIDAY_KEYWORDS.includes(l.trim())); return l?l.trim():''; }
+function isExam(s)        { return s.includes('정기시험')||s.includes('모의평가')||s.includes('모평')||s.includes('연합평가')||s.includes('수학능력'); }
+function pad(n)           { return String(n).padStart(2,'0'); }
+function dateKey(y,m,d)   { return `${y}-${pad(m+1)}-${pad(d)}`; }
+function isToday(y,m,d)   { const t=new Date(); return t.getFullYear()===y&&t.getMonth()===m&&t.getDate()===d; }
+
+// 이번 주 범위 캐싱 (날짜가 바뀌지 않는 한 재계산 불필요)
+const _thisWeekRange = (() => {
+  const t=new Date(); t.setHours(0,0,0,0);
+  const sun=new Date(t); sun.setDate(t.getDate()-t.getDay());
+  const sat=new Date(sun); sat.setDate(sun.getDate()+6);
+  return { sun, sat };
+})();
+function isThisWeek(y,m,d){
+  const tg=new Date(y,m,d);
+  return tg>=_thisWeekRange.sun && tg<=_thisWeekRange.sat;
+}
+
+// ── 오늘 스크롤 ───────────────────────────────
+function scrollToToday() {
+  if (isMobile() || currentNavMode === 'page') {
+    // 페이지 모드: 오늘 달로 이동
+    const today = new Date();
+    const idx = MONTHS.findIndex(m => m.y === today.getFullYear() && m.m === today.getMonth());
+    if (idx >= 0) {
+      pageIdx = idx;
+      showPageMonth();
+      if (isMobile()) {
+        document.getElementById('mobile-month-label').textContent = MONTHS[pageIdx].label;
+        setTimeout(renderMobileEvents, 50);
+      }
+    }
+  } else {
+    const cell = document.querySelector('.today-cell');
+    if (cell) scrollToMonth(cell.closest('.month-block')) || cell.scrollIntoView({behavior:'smooth', block:'center'});
+  }
+}
+
+// ── 인쇄 ──────────────────────────────────────
+function printMonth(label) {
+  const blocks=document.querySelectorAll('.month-block');
+  blocks.forEach(b=>b.classList.toggle('print-hidden',b.dataset.label!==label));
+  window.print();
+  setTimeout(()=>blocks.forEach(b=>b.classList.remove('print-hidden')),1000);
+}
+function printCurrentMonth() {
+  printMonth(document.getElementById('sticky-month-label').textContent);
+}
+
+// ── 상세 팝업 ─────────────────────────────────
+function openDetail(k) {
+  currentKey=k;
+  const ev=EVENT_MAP[k]||{};
+  const [y,mo,d]=k.split('-');
+  const dow=["일","월","화","수","목","금","토"][new Date(parseInt(y),parseInt(mo)-1,parseInt(d)).getDay()];
+  document.getElementById('modal-date').textContent=`${y}년 ${parseInt(mo)}월 ${parseInt(d)}일 (${dow})`;
+  document.getElementById('modal-title').textContent='일정 상세';
+  const g3Lines=(ev.g3||'').split('\n').filter(s=>s.trim());
+  const schoolLines=(ev.school||'').split('\n').filter(s=>s.trim());
+  const examLines=schoolLines.filter(s=>isExam(s));
+  const otherLines=schoolLines.filter(s=>!isExam(s));
+  let html='';
+  if(g3Lines.length>0){ html+='<div class="modal-section"><div class="modal-label">3학년부 일정</div>'; g3Lines.forEach(t=>{html+=`<div class="modal-item">${t}</div>`;}); html+='</div>'; }
+  if(examLines.length>0){ html+='<div class="modal-section"><div class="modal-label">시험·평가</div>'; examLines.forEach(t=>{html+=`<div class="modal-item-exam">${t}</div>`;}); html+='</div>'; }
+  if(otherLines.length>0){ html+='<div class="modal-section"><div class="modal-label">학교 전체 일정</div>'; otherLines.forEach(t=>{html+=`<div class="modal-item-school">${t}</div>`;}); html+='</div>'; }
+  if(!html) html='<div class="modal-empty">등록된 일정이 없습니다.</div>';
+  document.getElementById('modal-body').innerHTML=html;
+  document.getElementById('modal-footer').innerHTML=
+    `<button class="edit-btn" onclick="openEditMode()">수정하기</button>`+
+    `<button class="close-btn" onclick="closeModalDirect()">닫기</button>`;
+  document.getElementById('overlay').classList.add('open');
+}
+function openEditMode() {
+  const ev=EVENT_MAP[currentKey]||{};
+  document.getElementById('modal-title').textContent='일정 수정';
+  document.getElementById('modal-body').innerHTML=
+    `<div class="modal-section"><div class="modal-label">3학년부 일정</div>
+     <textarea class="modal-textarea" id="edit-g3" placeholder="3학년부 일정 입력 (줄바꿈으로 구분)">${ev.g3||''}</textarea></div>
+     <div class="modal-section"><div class="modal-label">학교 일정</div>
+     <textarea class="modal-textarea" id="edit-school" placeholder="학교 일정 입력 (줄바꿈으로 구분)">${ev.school||''}</textarea></div>
+     <div class="save-error" id="save-error"></div>`;
+  document.getElementById('modal-footer').innerHTML=
+    `<button class="save-btn" id="save-btn" onclick="saveEdit()">저장</button>`+
+    `<button class="close-btn" onclick="openDetail(currentKey)">취소</button>`;
+}
+async function saveEdit() {
+  const g3Val=document.getElementById('edit-g3').value.trim();
+  const schoolVal=document.getElementById('edit-school').value.trim();
+  const saveBtn=document.getElementById('save-btn');
+  saveBtn.disabled=true; saveBtn.textContent='저장 중...';
+  try {
+    await fetch(API_URL,{method:'POST',body:JSON.stringify({date:currentKey,school:schoolVal,g3:g3Val})});
+    EVENT_MAP[currentKey]={school:schoolVal,g3:g3Val};
+    buildCalendar(); renderSummary();
+    setStatus('ok','저장 완료!'); openDetail(currentKey);
+  } catch(e) {
+    document.getElementById('save-error').textContent='저장 실패. 다시 시도해주세요.';
+    saveBtn.disabled=false; saveBtn.textContent='저장';
+  }
+}
+function closeModal(e)     { if(e.target===document.getElementById('overlay')) closeModalDirect(); }
+function closeModalDirect(){ document.getElementById('overlay').classList.remove('open'); }
+
+// ── 보기/표시/탐색 모드 ──────────────────────
+let currentViewMode    = 'all';
+let currentDisplayMode = 'full';
+let currentNavMode     = 'scroll';
+
+function setViewMode(mode, btn) {
+  currentViewMode = mode;
+  document.querySelectorAll('#view-all,#view-g3,#view-school').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  buildCalendar();
+  if (currentNavMode === 'page') showPageMonth();
+  saveSettings();
+}
+
+function setDisplayMode(mode, btn) {
+  currentDisplayMode = mode;
+  document.querySelectorAll('#mode-full,#mode-compact').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  applyLayout();
+  buildCalendar();
+  if (currentNavMode === 'page') showPageMonth();
+  saveSettings();
+}
+
+function setNavMode(mode, btn) {
+  currentNavMode = mode;
+  document.querySelectorAll('#nav-scroll,#nav-page').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const pageGroup = document.getElementById('page-nav-group');
+  const pageDiv   = document.getElementById('page-nav-inline');
+  if (mode === 'page') {
+    pageGroup.style.display = '';
+    if (pageDiv) pageDiv.style.display = '';
+    const today = new Date();
+    pageIdx = MONTHS.findIndex(m => m.y === today.getFullYear() && m.m === today.getMonth());
+    if (pageIdx < 0) pageIdx = 0;
+    buildCalendar();
+    showPageMonth();
+  } else {
+    pageGroup.style.display = 'none';
+    if (pageDiv) pageDiv.style.display = 'none';
+    const stickyRow = document.querySelector('.sticky-month-row');
+    if (stickyRow) stickyRow.style.display = '';
+    document.getElementById('months-container').classList.remove('page-nav-mode');
+    document.querySelector('.cal-body').classList.remove('page-nav-mode');
+    document.querySelectorAll('.month-title, .month-header').forEach(el => el.style.display = '');
+    document.querySelectorAll('.month-block').forEach(b => b.style.display = '');
+    buildCalendar();
+  }
+  saveSettings();
+}
+
+function applyLayout() {
+  const container    = document.getElementById('months-container');
+  const wrap         = document.getElementById('cal-zoom-wrap');
+  const header       = document.getElementById('cal-zoom-wrap-header');
+  const ctrlWrap     = document.getElementById('cal-controls-wrap');
+  const calSticky    = document.getElementById('cal-sticky');
+  if (currentDisplayMode === 'compact') {
+    container.classList.add('compact-mode');
+    calSticky.classList.add('compact-header');
+    wrap.style.maxWidth      = '50%';
+    wrap.style.margin        = '0 auto';
+    header.style.maxWidth    = '50%';
+    header.style.margin      = '0 auto';
+    ctrlWrap.style.maxWidth  = '50%';
+    ctrlWrap.style.margin    = '0 auto';
+    calcCompactCellHeight();
+  } else {
+    container.classList.remove('compact-mode');
+    calSticky.classList.remove('compact-header');
+    wrap.style.maxWidth      = '100%';
+    wrap.style.margin        = '0 auto';
+    header.style.maxWidth    = '100%';
+    header.style.margin      = '0 auto';
+    ctrlWrap.style.maxWidth  = '100%';
+    ctrlWrap.style.margin    = '0 auto';
+  }
+}
+
+function calcCompactCellHeight() {
+  const stickyH    = document.getElementById('cal-sticky').offsetHeight;
+  const calHeaderH = document.getElementById('cal-zoom-wrap-header').offsetHeight;
+  const availH     = window.innerHeight - stickyH - calHeaderH - 32;
+
+  let idx = pageIdx;
+  if (currentNavMode !== 'page') {
+    const today = new Date();
+    const found = MONTHS.findIndex(mo => mo.y === today.getFullYear() && mo.m === today.getMonth());
+    idx = found >= 0 ? found : 0;
+  }
+  const { y, m } = MONTHS[idx] || MONTHS[0];
+  const firstDay = new Date(y, m, 1).getDay();
+  const lastDate = new Date(y, m + 1, 0).getDate();
+  const weeks    = Math.ceil((firstDay + lastDate) / 7);
+
+  const cellH = Math.max(60, Math.floor(availH / weeks));
+  document.documentElement.style.setProperty('--compact-cell-h', cellH + 'px');
+}
+
+// ── 페이지 모드 ───────────────────────────────
+let pageIdx = 0;
+
+function pageNav(dir) {
+  pageIdx = Math.max(0, Math.min(MONTHS.length - 1, pageIdx + dir));
+  showPageMonth();
+  if (currentDisplayMode === 'compact') setTimeout(calcCompactCellHeight, 50);
+}
+
+function showPageMonth() {
+  const blocks = document.querySelectorAll('.month-block');
+  blocks.forEach((b, i) => b.style.display = i === pageIdx ? '' : 'none');
+  const label = MONTHS[pageIdx].label;
+  document.getElementById('page-nav-label').textContent = label;
+  const stickyRow = document.querySelector('.sticky-month-row');
+  if (stickyRow) stickyRow.style.display = 'none';
+  document.querySelectorAll('.month-title, .month-header').forEach(el => el.style.display = 'none');
+  document.getElementById('months-container').classList.add('page-nav-mode');
+  document.querySelector('.cal-body').classList.add('page-nav-mode');
+  const stickyH = document.getElementById('cal-sticky').offsetHeight;
+  window.scrollTo({ top: document.getElementById('cal-zoom-wrap').offsetTop - stickyH - 8, behavior: 'smooth' });
+  if (currentDisplayMode === 'compact') setTimeout(calcCompactCellHeight, 50);
+}
+
+// ── 컴팩트 셀 헬퍼 (buildMonth 루프 밖에서 정의) ──
+function _makeCompactRow(type, textContent) {
+  const row = document.createElement('div');
+  row.className = 'compact-line ' + type;
+  const dot = document.createElement('span');
+  dot.className = 'compact-dot ' + type;
+  const txt = document.createElement('span');
+  txt.className = 'compact-text';
+  txt.textContent = textContent;
+  row.appendChild(dot); row.appendChild(txt);
+  return row;
+}
+function _addCompactAll(cell, lines, type) {
+  lines.forEach(t => {
+    const short = t.length > 10 ? t.slice(0, 10) + '…' : t;
+    cell.appendChild(_makeCompactRow(type, short));
+  });
+}
+function _addCompactOne(cell, lines, type) {
+  if (!lines.length) return;
+  const short = lines[0].length > 10 ? lines[0].slice(0, 10) + '…' : lines[0];
+  const row = _makeCompactRow(type, short);
+  if (lines.length > 1) {
+    const more = document.createElement('span');
+    more.className = 'compact-more';
+    more.textContent = '+' + (lines.length - 1);
+    row.appendChild(more);
+  }
+  cell.appendChild(row);
+}
+
+// ── 달력 렌더링 ───────────────────────────────
+function buildCalendar() {
+  const container=document.getElementById('months-container');
+  container.innerHTML='';
+  MONTHS.forEach(({y,m,label})=>container.appendChild(buildMonth(y,m,label)));
+  const q=document.getElementById('search-input').value.trim();
+  if(q) doSearch(q);
+  if(isMobile()) setTimeout(renderMobileEvents, 50);
+}
+
+function buildMonth(y,m,label) {
+  const wrap=document.createElement('div');
+  wrap.className='month-block'; wrap.dataset.label=label;
+  const title=document.createElement('div');
+  title.className='month-title'; title.textContent=label;
+  if (currentNavMode === 'page') title.style.display = 'none';
+  wrap.appendChild(title);
+  const dowRow=document.createElement('div');
+  dowRow.className='dow-row';
+  ["일","월","화","수","목","금","토"].forEach((w,i)=>{
+    const c=document.createElement('div');
+    c.className='dow-cell'+(i===0?' sun':i===6?' sat':'');
+    c.textContent=w; dowRow.appendChild(c);
+  });
+  wrap.appendChild(dowRow);
+  const grid=document.createElement('div');
+  grid.className='cal-grid';
+  const first=new Date(y,m,1).getDay();
+  const days=new Date(y,m+1,0).getDate();
+  for(let i=0;i<first;i++){ const e=document.createElement('div'); e.className='day-cell empty'; grid.appendChild(e); }
+  for(let d=1;d<=days;d++){
+    const dow=new Date(y,m,d).getDay();
+    const k=dateKey(y,m,d);
+    const ev=EVENT_MAP[k]||{school:'',g3:''};
+    const school=ev.school||'', g3=ev.g3||'';
+    const holiday=isHoliday(school)||isHoliday(g3);
+    const cell=document.createElement('div');
+    let cls='day-cell';
+    if(dow===0) cls+=' sunday-cell';
+    if(dow===6) cls+=' saturday-cell';
+    if(holiday) cls+=' holiday-cell';
+    if(isThisWeek(y,m,d)) cls+=' this-week-cell';
+    if(isToday(y,m,d)) cls+=' today-cell';
+    cell.className=cls; cell.dataset.key=k; cell.onclick=()=>openDetail(k);
+    const num=document.createElement('div');
+    num.className='day-num'; num.textContent=d; cell.appendChild(num);
+    if(holiday){
+      const hLine=getHolidayName(school)||getHolidayName(g3);
+      if(hLine){ const el=document.createElement('div'); el.className='ev-holiday'; el.textContent=hLine; cell.appendChild(el); }
+    }
+    const g3Lines=g3.split('\n').filter(s=>s.trim());
+    if(g3Lines.length>0 && currentViewMode !== 'school'){
+      const sec=document.createElement('div'); sec.className='section-g3';
+      const lbl=document.createElement('div'); lbl.className='section-g3-label'; lbl.textContent='3학년부'; sec.appendChild(lbl);
+      g3Lines.forEach(t=>{ const el=document.createElement('div'); el.className='ev-3rd'; el.textContent=t; sec.appendChild(el); });
+      cell.appendChild(sec);
+    }
+    const schoolLines=school.split('\n').filter(s=>s.trim());
+    if(schoolLines.length>0 && currentViewMode !== 'g3'){
+      const sec=document.createElement('div'); sec.className='section-school';
+      const lbl=document.createElement('div'); lbl.className='section-school-label'; lbl.textContent='학교'; sec.appendChild(lbl);
+      schoolLines.forEach(t=>{ const el=document.createElement('div'); el.className=isExam(t)?'ev-exam':'ev-school'; el.textContent=t; sec.appendChild(el); });
+      cell.appendChild(sec);
+    }
+
+    // 컴팩트 모드: 압축 표시 + 툴팁
+    if (currentDisplayMode === 'compact') {
+      if (currentViewMode !== 'school') {
+        _addCompactAll(cell, g3Lines, 'g3');
+      }
+      if (currentViewMode !== 'g3') {
+        const examL  = schoolLines.filter(s=>isExam(s));
+        const otherL = schoolLines.filter(s=>!isExam(s));
+        if (examL.length)  _addCompactOne(cell, examL, 'exam');
+        if (otherL.length) _addCompactOne(cell, otherL, 'sch');
+      }
+
+      // 툴팁
+      const tipLines = [];
+      if (g3Lines.length && currentViewMode !== 'school') {
+        tipLines.push('▶ 3학년부\n' + g3Lines.join('\n'));
+      }
+      if (schoolLines.length && currentViewMode !== 'g3') {
+        tipLines.push('▶ 학교\n' + schoolLines.join('\n'));
+      }
+      if (tipLines.length) {
+        const DOW_TIP = ['일','월','화','수','목','금','토'];
+        const tipDate = new Date(y, m, d);
+        const dateLabel = `${y}년 ${m+1}월 ${d}일 (${DOW_TIP[tipDate.getDay()]})`;
+
+        const tip = document.createElement('div');
+        tip.className = 'cal-tooltip';
+
+        const dateEl = document.createElement('div');
+        dateEl.style.cssText = 'font-weight:700; font-size:12px; color:#185FA5; margin-bottom:6px; padding-bottom:5px; border-bottom:1px solid #eee;';
+        dateEl.textContent = dateLabel;
+        tip.appendChild(dateEl);
+
+        const bodyEl = document.createElement('div');
+        bodyEl.style.whiteSpace = 'pre-wrap';
+        bodyEl.textContent = tipLines.join('\n\n');
+        tip.appendChild(bodyEl);
+
+        cell.appendChild(tip);
+      }
+    }
+    grid.appendChild(cell);
+  }
+  wrap.appendChild(grid); return wrap;
+}
+
+// ── 줌 ────────────────────────────────────────
+// ── 글씨 크기 조절 ───────────────────────────
+let currentFont = 1;
+
+function applyFont(f) {
+  currentFont = Math.min(1.5, Math.max(0.6, Math.round(f * 10) / 10));
+  document.getElementById('cal-zoom-wrap').style.fontSize = (currentFont * 16) + 'px';
+  document.getElementById('font-value').textContent = Math.round(currentFont * 100) + '%';
+  if (typeof saveSettings === 'function') saveSettings();
+}
+function fontUp()    { applyFont(currentFont + 0.1); }
+function fontDown()  { applyFont(currentFont - 0.1); }
+function fontReset() { applyFont(1); }
+
+// ── 화면 크기 조절 ───────────────────────────
+let currentZoom = 1;
+function applyZoom(z) {
+  currentZoom = Math.min(2, Math.max(0.5, Math.round(z * 10) / 10));
+  const pct = Math.round(currentZoom * 100) + '%';
+  document.getElementById('cal-zoom-wrap').style.maxWidth = pct;
+  document.getElementById('cal-zoom-wrap').style.margin = '0 auto';
+  document.getElementById('cal-zoom-wrap-header').style.maxWidth = pct;
+  document.getElementById('cal-zoom-wrap-header').style.margin = '0 auto';
+  localStorage.setItem('cal-zoom', currentZoom);
+}
+function zoomIn()    { applyZoom(currentZoom+0.1); }
+function zoomOut()   { applyZoom(currentZoom-0.1); }
+function zoomReset() { applyZoom(1); }
+window.addEventListener('wheel',(e)=>{ if(!e.ctrlKey)return; e.preventDefault(); e.deltaY<0?fontUp():fontDown(); },{passive:false});
+
+// ── 3학년부 팝업 ──────────────────────────────
+const DOW_NAMES=["일","월","화","수","목","금","토"];
+let g3Filter='upcoming';
+function openG3Panel()  { renderG3List(); document.getElementById('g3-overlay').classList.add('open'); }
+function closeG3Panel(e){ if(e.target===document.getElementById('g3-overlay')) closeG3PanelDirect(); }
+function closeG3PanelDirect(){ document.getElementById('g3-overlay').classList.remove('open'); }
+function setG3Filter(f,btn){
+  g3Filter=f;
+  document.querySelectorAll('.g3-filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active'); renderG3List();
+}
+function renderG3List() {
+  const today=new Date(); today.setHours(0,0,0,0);
+  const entries=Object.entries(EVENT_MAP).filter(([k,ev])=>ev.g3&&ev.g3.trim()).sort((a,b)=>a[0].localeCompare(b[0]));
+  const filtered=entries.filter(([k])=>{ const d=new Date(k); if(g3Filter==='upcoming')return d>=today; if(g3Filter==='past')return d<today; return true; });
+  let html=`<div class="g3-filter">
+    <button class="g3-filter-btn ${g3Filter==='all'?'active':''}" onclick="setG3Filter('all',this)">전체</button>
+    <button class="g3-filter-btn ${g3Filter==='upcoming'?'active':''}" onclick="setG3Filter('upcoming',this)">앞으로</button>
+    <button class="g3-filter-btn ${g3Filter==='past'?'active':''}" onclick="setG3Filter('past',this)">지난 일정</button>
+  </div><div class="g3-count">총 ${filtered.length}건</div>`;
+  if(!filtered.length){ html+='<div class="g3-empty">해당하는 일정이 없습니다.</div>'; }
+  else { filtered.forEach(([k,ev])=>{
+    const d=new Date(k), dow=DOW_NAMES[d.getDay()], isPast=d<today;
+    const [y,m,day]=k.split('-');
+    const lines=ev.g3.split('\n').filter(s=>s.trim());
+    html+=`<div class="g3-item" onclick="jumpToDate('${k}')" style="${isPast?'opacity:0.5':''}">
+      <div class="g3-date-col"><div class="g3-date">${parseInt(m)}월 ${parseInt(day)}일</div><div class="g3-dow">${y}년 ${dow}요일</div></div>
+      <div class="g3-content"><span class="g3-tag">3학년부</span><div class="g3-text">${lines.join('<br>')}</div></div>
+    </div>`;
+  }); }
+  document.getElementById('g3-list').innerHTML=html;
+}
+function jumpToDate(k) {
+  closeG3PanelDirect();
+  const cell=document.querySelector(`.day-cell[data-key="${k}"]`);
+  if(cell){ setTimeout(()=>{ cell.scrollIntoView({behavior:'smooth',block:'center'}); cell.style.outline='3px solid #0F6E56'; setTimeout(()=>cell.style.outline='',1500); },200); }
+}
+
+// ── 스크롤 감지 ───────────────────────────────
+function updateStickyMonth() {
+  if (currentNavMode === 'page') return;
+  const stickyH = document.getElementById('cal-sticky').offsetHeight;
+  let current = null;
+  document.querySelectorAll('.month-block').forEach(b => {
+    if (b.getBoundingClientRect().top <= stickyH + 4) current = b;
+  });
+  if (current) document.getElementById('sticky-month-label').textContent = current.dataset.label;
+}
+window.addEventListener('scroll',updateStickyMonth,{passive:true});
+
+// ── 단축키 ────────────────────────────────────
+document.addEventListener('keydown',(e)=>{
+  const tag=document.activeElement.tagName;
+  if(tag==='INPUT'||tag==='TEXTAREA'){ if(e.key==='Escape') document.activeElement.blur(); return; }
+
+  // Esc → 열린 팝업 모두 닫기
+  if(e.key==='Escape'){
+    ['link-edit-overlay','notice-edit-overlay','g3-overlay','overlay',
+     'news-overlay','meal-overlay','tt-overlay','notice-popup-overlay','color-overlay']
+    .forEach(id => document.getElementById(id)?.classList.remove('open'));
+    return;
+  }
+  if(e.key==='/'){
+    e.preventDefault();
+    const input=document.getElementById('search-input');
+    input.focus(); input.select(); return;
+  }
+  if(e.key==='ArrowRight'||e.key==='ArrowLeft'){
+    e.preventDefault();
+    if(currentNavMode==='page'){
+      pageNav(e.key==='ArrowRight'?1:-1);
+      return;
+    }
+    const blocks=document.querySelectorAll('.month-block');
+    const stickyH=document.getElementById('cal-sticky').offsetHeight;
+    let curIdx=0;
+    blocks.forEach((b,i)=>{ if(b.getBoundingClientRect().top<=stickyH+10) curIdx=i; });
+    const nextIdx=e.key==='ArrowRight'?Math.min(curIdx+1,blocks.length-1):Math.max(curIdx-1,0);
+    scrollToMonth(blocks[nextIdx]);
+  }
+});
+
+// 헤더 높이만큼 보정해서 스크롤
+function scrollToMonth(block) {
+  const stickyH = document.getElementById('cal-sticky').offsetHeight;
+  const top = block.getBoundingClientRect().top + window.scrollY - stickyH - 8;
+  window.scrollTo({ top, behavior: 'smooth' });
+}
+
+// ── 페이지 모드 ───────────────────────────────
+
+// ── 팝업 글씨 크기 조절 ──────────────────────
+const popupFontSize = { g3: 1, notice: 1 };
+const popupFontTargets = {
+  g3:     { el: 'g3-list',           val: 'g3-font-val' },
+  notice: { el: 'notice-popup-body', val: 'notice-font-val' },
+};
+
+function popupFontChange(key, dir) {
+  const f = popupFontSize[key] = Math.min(1.5, Math.max(0.7,
+    Math.round((popupFontSize[key] + dir * 0.1) * 10) / 10
+  ));
+  const t = popupFontTargets[key];
+  const el = document.getElementById(t.el);
+  if (el) el.style.fontSize = (f * 14) + 'px';
+  const val = document.getElementById(t.val);
+  if (val) val.textContent = Math.round(f * 100) + '%';
+}
+
+let isFullWidth = false;
+let fullWidthStyle = null;
+function toggleFullWidth(btn) {
+  isFullWidth = !isFullWidth;
+  btn.classList.toggle('active', isFullWidth);
+  btn.textContent = isFullWidth ? '원래화면' : '최대화면';
+  btn.title = isFullWidth ? '원래 너비로' : '가로 최대화';
+  if (isFullWidth) {
+    fullWidthStyle = document.createElement('style');
+    fullWidthStyle.id = 'full-width-override';
+    fullWidthStyle.textContent = `
+      .page-wrap { max-width: 100% !important; padding: 0.5rem 0.4rem 3rem !important; }
+      #cal-zoom-wrap { max-width: 100% !important; }
+      #cal-zoom-wrap-header { max-width: 100% !important; }
+    `;
+    document.head.appendChild(fullWidthStyle);
+  } else {
+    document.getElementById('full-width-override')?.remove();
+    fullWidthStyle = null;
+    applyLayout();
+  }
+}
+
+
+// ── 모바일 패널 ───────────────────────────────
+function toggleMobilePanel(id) {
+  const body  = document.getElementById(id);
+  const arrow = document.getElementById(id + '-arrow');
+  const open  = body.style.display === 'none';
+  body.style.display  = open ? 'block' : 'none';
+  if (arrow) arrow.classList.toggle('open', open);
+}
+
+function renderMobilePanels() {
+  if (!isMobile()) return;
+
+  // 링크
+  const linkGrid = document.getElementById('mob-link-grid');
+  const srcGrid  = document.getElementById('link-grid');
+  if (linkGrid && srcGrid) linkGrid.innerHTML = srcGrid.innerHTML;
+
+  // 공지사항
+  const noticeList = document.getElementById('mob-notice-list');
+  const srcNotice  = document.getElementById('notice-list');
+  if (noticeList && srcNotice) noticeList.innerHTML = srcNotice.innerHTML;
+
+  // 3학년부 요약
+  const summaryList = document.getElementById('mob-summary-list');
+  const today = new Date(); today.setHours(0,0,0,0);
+  const DOW = ["일","월","화","수","목","금","토"];
+  const items = Object.entries(EVENT_MAP)
+    .filter(([k,ev]) => ev.g3 && ev.g3.trim() && new Date(k) >= today)
+    .sort((a,b) => a[0].localeCompare(b[0]))
+    .slice(0, 10);
+  if (summaryList) {
+    if (!items.length) {
+      summaryList.innerHTML = '<div style="padding:8px 4px;font-size:12px;color:#aaa;">앞으로 예정된 3학년부 일정이 없습니다.</div>';
+    } else {
+      summaryList.innerHTML = items.map(([k,ev]) => {
+        const d = new Date(k);
+        const [y,m,day] = k.split('-');
+        const lines = ev.g3.split('\n').filter(s=>s.trim());
+        return `<div style="padding:8px 6px;border-bottom:1px solid #f0efeb;cursor:pointer;" onclick="mobileGoToDate('${k}')">
+          <div style="font-size:11px;font-weight:700;color:#185FA5;">${parseInt(m)}월 ${parseInt(day)}일 (${DOW[d.getDay()]})</div>
+          <div style="font-size:12px;color:#333;margin-top:2px;">${lines.join(' · ')}</div>
+        </div>`;
+      }).join('');
+    }
+  }
+}
+
+function mobileGoToDate(k) {
+  const [y, m] = k.split('-').map(Number);
+  const idx = MONTHS.findIndex(mo => mo.y === y && mo.m === m - 1);
+  if (idx >= 0) {
+    pageIdx = idx;
+    document.getElementById('mobile-month-label').textContent = MONTHS[pageIdx].label;
+    showPageMonth();
+    renderMobileEvents();
+  }
+  // 패널 닫기
+  ['mob-links','mob-notices','mob-summary'].forEach(id => {
+    document.getElementById(id).style.display = 'none';
+    document.getElementById(id+'-arrow')?.classList.remove('open');
+  });
+}
+
+function mobileSetView(mode) {
+  currentViewMode = mode;
+  // PC 버튼도 동기화
+  document.querySelectorAll('#view-all,#view-g3,#view-school').forEach(b => b.classList.remove('active'));
+  const map = {all:'view-all', g3:'view-g3', school:'view-school'};
+  document.getElementById(map[mode])?.classList.add('active');
+  // 모바일 버튼 활성화
+  ['all','g3','school'].forEach(v => {
+    document.getElementById('mob-view-'+v+'2')?.classList.toggle('active', v===mode);
+  });
+  buildCalendar();
+  if (currentNavMode === 'page') showPageMonth();
+  setTimeout(renderMobileEvents, 50);
+}
+
+// ── 📱 QR코드 ─────────────────────────────────
+let _qrInstance = null;
+
+function generateQR() {
+  const text = document.getElementById('qr-input').value.trim();
+  if (!text) { alert('URL 또는 텍스트를 입력해주세요.'); return; }
+
+  const wrap = document.getElementById('qr-canvas');
+  wrap.innerHTML = '';
+  if (_qrInstance) { _qrInstance.clear(); _qrInstance = null; }
+
+  _qrInstance = new QRCode(wrap, {
+    text: text,
+    width: 280,
+    height: 280,
+    colorDark: '#1a1a1a',
+    colorLight: '#ffffff',
+    correctLevel: QRCode.CorrectLevel.H
+  });
+
+  document.getElementById('qr-preview-wrap').style.display = 'block';
+  document.getElementById('qr-url-label').textContent = text;
+}
+
+function downloadQR() {
+  const canvas = document.querySelector('#qr-canvas canvas');
+  if (!canvas) { alert('먼저 QR코드를 생성해주세요.'); return; }
+  const url = canvas.toDataURL('image/png');
+  const a = document.createElement('a');
+  a.download = 'qrcode.png';
+  a.href = url;
+  a.click();
+}
+
+function resetQR() {
+  document.getElementById('qr-input').value = '';
+  document.getElementById('qr-canvas').innerHTML = '';
+  document.getElementById('qr-preview-wrap').style.display = 'none';
+  _qrInstance = null;
+}
+
+// ── 모바일 감지 및 초기화 ────────────────────
+const isMobile = () => window.innerWidth <= 768;
+
+function initMobile() {
+  if (!isMobile()) return;
+  document.getElementById('mobile-header').style.display = 'flex';
+  // 페이지 모드 자동 적용
+  currentNavMode = 'page';
+  document.getElementById('nav-page')?.classList.add('active');
+  document.getElementById('nav-scroll')?.classList.remove('active');
+  document.getElementById('page-nav-group').style.display = '';
+  document.getElementById('page-nav-inline').style.display = '';
+  // 오늘 달 찾기
+  const today = new Date();
+  pageIdx = MONTHS.findIndex(m => m.y === today.getFullYear() && m.m === today.getMonth());
+  if (pageIdx < 0) pageIdx = 0;
+}
+
+function mobilePageNav(dir) {
+  pageIdx = Math.max(0, Math.min(MONTHS.length - 1, pageIdx + dir));
+  document.getElementById('mobile-month-label').textContent = MONTHS[pageIdx].label;
+  showPageMonth();
+  renderMobileEvents();
+}
+
+function openMobileDrawer() {
+  document.getElementById('mobile-drawer').classList.add('open');
+  document.getElementById('mobile-drawer-overlay').classList.add('open');
+}
+function closeMobileDrawer() {
+  document.getElementById('mobile-drawer').classList.remove('open');
+  document.getElementById('mobile-drawer-overlay').classList.remove('open');
+}
+
+function updateMobileDrawerBtns(type, val) {
+  if (type === 'view') {
+    ['all','g3','school'].forEach(v => {
+      document.getElementById('mob-view-'+v)?.classList.toggle('active', v===val);
+    });
+  } else if (type === 'mode') {
+    ['full','compact'].forEach(v => {
+      document.getElementById('mob-mode-'+v)?.classList.toggle('active', v===val);
+    });
+  }
+}
+
+// 모바일 일정 렌더링 (3~4글자 + 점)
+function renderMobileEvents() {
+  if (!isMobile()) return;
+  const MAX_ITEMS = 3; // 칸당 최대 표시 수
+  document.querySelectorAll('.day-cell:not(.empty)').forEach(cell => {
+    // 기존 모바일 이벤트 제거
+    cell.querySelectorAll('.mobile-ev').forEach(e => e.remove());
+    const k  = cell.dataset.key;
+    const ev = EVENT_MAP[k] || {};
+    const g3Lines     = (ev.g3||'').split('\n').filter(s=>s.trim());
+    const schoolLines = (ev.school||'').split('\n').filter(s=>s.trim());
+    const examLines   = schoolLines.filter(s=>isExam(s));
+    const otherLines  = schoolLines.filter(s=>!isExam(s));
+
+    let items = [];
+    if (currentViewMode !== 'school') {
+      g3Lines.forEach(t => items.push({text:t, cls:'g3'}));
+    }
+    if (currentViewMode !== 'g3') {
+      examLines.forEach(t => items.push({text:t, cls:'exam'}));
+      otherLines.forEach(t => items.push({text:t, cls:'sch'}));
+    }
+
+    const shown = items.slice(0, MAX_ITEMS);
+    const more  = items.length - shown.length;
+
+    shown.forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'mobile-ev ' + item.cls;
+      const dot = document.createElement('span');
+      dot.className = 'mobile-ev-dot ' + item.cls;
+      const txt = document.createElement('span');
+      txt.className = 'mobile-ev-text';
+      txt.textContent = item.text.slice(0, 6);
+      div.appendChild(dot);
+      div.appendChild(txt);
+      cell.appendChild(div);
+    });
+
+    if (more > 0) {
+      const last = cell.querySelector('.mobile-ev:last-child');
+      if (last) {
+        const m = document.createElement('span');
+        m.className = 'mobile-ev-more';
+        m.textContent = '+' + more;
+        last.appendChild(m);
+      }
+    }
+  });
+}
+
+
+// ══════════════════════════════════════════
+// 🎲 도구 툴박스
+// ══════════════════════════════════════════
+function openToolbox() {
+  const el = document.getElementById('toolbox-overlay');
+  el.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+  switchTool('stopwatch');
+}
+function closeToolbox() {
+  document.getElementById('toolbox-overlay').style.display = 'none';
+  document.body.style.overflow = '';
+  swPause(); timerPause();
+}
+function switchTool(name) {
+  ['stopwatch','timer','ladder','lottery','qr'].forEach(t => {
+    const el = document.getElementById('tool-'+t);
+    el.style.display = 'none';
+    document.getElementById('tab-'+t).classList.toggle('active', t===name);
+  });
+  const target = document.getElementById('tool-'+name);
+  target.style.display = ['ladder','lottery','qr'].includes(name) ? 'block' : 'flex';
+}
+
+// ── ⏱ 스톱워치 ──────────────────────────
+let swInterval=null, swMs=0, swRunning=false, swLaps=[], swLapStart=0;
+function swFormat(ms) {
+  const h=Math.floor(ms/3600000), m=Math.floor(ms%3600000/60000),
+        s=Math.floor(ms%60000/1000), c=Math.floor(ms%1000/10);
+  if(h>0) return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}.${String(c).padStart(2,'0')}`;
+}
+function swToggle() { swRunning ? swPause() : swStart(); }
+function swStart() {
+  swRunning=true;
+  const btn=document.getElementById('sw-btn-start');
+  btn.textContent='일시정지'; btn.style.background='#883333';
+  if(!swLapStart) swLapStart=Date.now()-swMs;
+  let base=Date.now()-swMs;
+  swInterval=setInterval(()=>{
+    swMs=Date.now()-base;
+    document.getElementById('sw-display').textContent=swFormat(swMs);
+    const lapMs=swMs-(swLaps.reduce((a,l)=>a+l.ms,0));
+    document.getElementById('sw-sub').textContent='랩 '+swFormat(lapMs);
+  },30);
+}
+function swPause() {
+  swRunning=false; clearInterval(swInterval);
+  const btn=document.getElementById('sw-btn-start');
+  btn.textContent='재개'; btn.style.background='#338833';
+}
+function swLap() {
+  if(!swRunning) return;
+  const lapTotal=swLaps.reduce((a,l)=>a+l.ms,0);
+  const lapMs=swMs-lapTotal;
+  swLaps.push({ms:lapMs,total:swMs});
+  const el=document.getElementById('sw-laps');
+  el.innerHTML=swLaps.slice().reverse().map((l,i)=>`
+    <div class="sw-lap-item">
+      <span>LAP ${swLaps.length-i}</span>
+      <span>${swFormat(l.ms)}</span>
+      <span style="color:#333;">${swFormat(l.total)}</span>
+    </div>`).join('');
+}
+function swReset() {
+  clearInterval(swInterval); swMs=0; swRunning=false; swLaps=[]; swLapStart=0;
+  document.getElementById('sw-display').textContent='00:00.00';
+  document.getElementById('sw-sub').textContent='';
+  const btn=document.getElementById('sw-btn-start');
+  btn.textContent='시작'; btn.style.background='';
+  document.getElementById('sw-laps').innerHTML='';
+}
+
+// ── ⏲ 타이머 ──────────────────────────────
+let timerInterval=null, timerRemain=0, timerRunning=false;
+function timerToggle() {
+  if(timerRunning){ timerPause(); return; }
+  if(timerRemain===0){
+    const h=parseInt(document.getElementById('timer-h').value)||0;
+    const m=parseInt(document.getElementById('timer-m').value)||0;
+    const s=parseInt(document.getElementById('timer-s').value)||0;
+    timerRemain=(h*3600+m*60+s)*1000;
+    if(!timerRemain) return;
+  }
+  document.getElementById('timer-done').style.display='none';
+  document.getElementById('timer-input-wrap').style.display='none';
+  timerRunning=true;
+  const btn=document.getElementById('timer-btn-start');
+  btn.textContent='일시정지'; btn.style.background='#883333';
+  let last=Date.now();
+  timerInterval=setInterval(()=>{
+    timerRemain-=(Date.now()-last); last=Date.now();
+    if(timerRemain<=0){ timerRemain=0; timerDone(); return; }
+    const total=Math.ceil(timerRemain/1000);
+    const h=Math.floor(total/3600), m=Math.floor(total%3600/60), s=total%60;
+    const disp=document.getElementById('timer-display');
+    disp.textContent=h>0
+      ?`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`
+      :`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    disp.style.color=timerRemain<10000?'#ff5555':'#fff';
+    disp.style.textShadow=timerRemain<10000
+      ?'0 0 60px rgba(255,80,80,0.6)':'0 0 60px rgba(255,160,80,0.4)';
+  },100);
+}
+function timerPause() {
+  clearInterval(timerInterval); timerRunning=false;
+  const btn=document.getElementById('timer-btn-start');
+  btn.textContent='재개'; btn.style.background='#338833';
+}
+function timerDone() {
+  clearInterval(timerInterval); timerRunning=false;
+  document.getElementById('timer-display').textContent='00:00';
+  document.getElementById('timer-done').style.display='block';
+  const btn=document.getElementById('timer-btn-start');
+  btn.textContent='시작'; btn.style.background='';
+  try {
+    const ctx=new AudioContext();
+    [0,400,800].forEach(d=>{
+      const o=ctx.createOscillator(), g=ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.frequency.value=880; g.gain.setValueAtTime(0.4,ctx.currentTime+d/1000);
+      g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+d/1000+0.5);
+      o.start(ctx.currentTime+d/1000); o.stop(ctx.currentTime+d/1000+0.5);
+    });
+  }catch(e){}
+}
+function timerReset() {
+  clearInterval(timerInterval); timerRemain=0; timerRunning=false;
+  const disp=document.getElementById('timer-display');
+  disp.textContent='00:00'; disp.style.color='#fff';
+  disp.style.textShadow='0 0 60px rgba(255,160,80,0.4)';
+  document.getElementById('timer-done').style.display='none';
+  document.getElementById('timer-input-wrap').style.display='flex';
+  const btn=document.getElementById('timer-btn-start');
+  btn.textContent='시작'; btn.style.background='';
+}
+
+// ── 🪜 사다리타기 (애니메이션) ──────────────
+let ladderAssignment=[], ladderPlayers=[], ladderResultsArr=[], ladderMap=[], ladderN=0;
+const LADDER_COLORS=['#4466ff','#ff4488','#00bb88','#ff8800','#8844ff','#00aadd','#ff4444','#88bb00'];
+
+function startLadder() {
+  ladderPlayers=document.getElementById('ladder-players').value.trim().split('\n').map(s=>s.trim()).filter(Boolean);
+  ladderResultsArr=document.getElementById('ladder-results').value.trim().split('\n').map(s=>s.trim()).filter(Boolean);
+  if(ladderPlayers.length<2){alert('참가자를 2명 이상 입력해주세요.');return;}
+  if(!ladderResultsArr.length){alert('결과를 입력해주세요.');return;}
+  while(ladderResultsArr.length<ladderPlayers.length) ladderResultsArr.push('꽝');
+
+  ladderN=ladderPlayers.length;
+  document.getElementById('ladder-setup').style.display='none';
+  document.getElementById('ladder-canvas-wrap').style.display='block';
+  document.getElementById('ladder-result-list').innerHTML='';
+
+  const STEPS=8;
+  ladderMap=[];
+  for(let c=0;c<ladderN-1;c++) ladderMap[c]=Array(STEPS).fill(false);
+  for(let s=0;s<STEPS;s++){
+    let c=0;
+    while(c<ladderN-1){
+      if(Math.random()>0.45 && !ladderMap[c][s]){ ladderMap[c][s]=true; c+=2; }
+      else c++;
+    }
+  }
+
+  // 경로 계산
+  ladderAssignment=[];
+  for(let i=0;i<ladderN;i++){
+    let col=i;
+    for(let s=0;s<STEPS;s++){
+      if(col<ladderN-1 && ladderMap[col][s]) col++;
+      else if(col>0 && ladderMap[col-1][s]) col--;
+    }
+    ladderAssignment[i]=col;
+  }
+
+  drawLadderAnimated(STEPS);
+}
+
+// 사다리 전역 변수
+let _ldrRevealed=[], _ldrIdx=0, _ldrAnim=false;
+let _ldrSTEPS=8, _ldrCtx=null, _ldrW=0, _ldrH=0;
+let _ldrPad=40, _ldrColW=0, _ldrTopY=58, _ldrBotY=0;
+
+function drawLadderAnimated(STEPS) {
+  const canvas = document.getElementById('ladder-canvas');
+  const W = Math.min(1060, (document.getElementById('tool-ladder').offsetWidth||700) - 48);
+  const H = 560; canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+  const n = ladderN, pad = 40, colW = (W-pad*2)/(n-1);
+  const topY = 70, botY = H-70;
+
+  // 완료된 경로 저장
+  _ldrRevealed = [];
+  _ldrIdx = 0;
+  _ldrAnim = false;
+  _ldrSTEPS = STEPS;
+  _ldrCtx = ctx;
+  _ldrW = W; _ldrH = H; _ldrPad = pad; _ldrColW = colW; _ldrTopY = topY; _ldrBotY = botY;
+
+  _drawBase();
+  document.getElementById('ladder-btn-next').disabled = false;
+  document.getElementById('ladder-btn-all').disabled = false;
+}
+
+function _drawBase() {
+  const ctx=_ldrCtx, n=ladderN, pad=_ldrPad, colW=_ldrColW, topY=_ldrTopY, botY=_ldrBotY, STEPS=_ldrSTEPS;
+  const W=_ldrW, H=_ldrH;
+  ctx.fillStyle = '#f8f7f4'; ctx.fillRect(0,0,W,H);
+  // 세로선
+  for (let i=0; i<n; i++) {
+    ctx.strokeStyle = LADDER_COLORS[i%LADDER_COLORS.length]+'33';
+    ctx.lineWidth=3; ctx.lineCap='round';
+    ctx.beginPath(); ctx.moveTo(pad+i*colW,topY); ctx.lineTo(pad+i*colW,botY); ctx.stroke();
+  }
+  // 가로선
+  for (let s=0; s<STEPS; s++) {
+    for (let c=0; c<n-1; c++) {
+      if (ladderMap[c][s]) {
+        const y = topY+(botY-topY)*(s+1)/(STEPS+1);
+        ctx.strokeStyle='#ccc'; ctx.lineWidth=2;
+        ctx.beginPath(); ctx.moveTo(pad+c*colW,y); ctx.lineTo(pad+(c+1)*colW,y); ctx.stroke();
+      }
+    }
+  }
+  // 이름/결과 글씨 크기 동적 계산
+  const fontSize = Math.max(11, Math.min(18, Math.floor(_ldrColW * 0.18)));
+  ctx.textAlign='center';
+
+  for (let i=0; i<n; i++) {
+    // 이름 (위)
+    ctx.font=`bold ${fontSize}px "Noto Sans KR",sans-serif`;
+    ctx.fillStyle = LADDER_COLORS[i%LADDER_COLORS.length];
+    ctx.fillText(ladderPlayers[i], pad+i*colW, topY-18);
+
+    // 결과 (아래) - assignment 기준으로 해당 열에 결과 표시
+    // 어떤 참가자가 이 결과 칸에 도달하는지 역산
+    const assignedPlayerIdx = ladderAssignment.indexOf(i);
+    const resultText = ladderResultsArr[i] || '?';
+    const revealed = _ldrRevealed.find(r => r.idx === assignedPlayerIdx);
+    ctx.font=`bold ${fontSize+2}px "Noto Sans KR",sans-serif`;
+    if (revealed) {
+      ctx.fillStyle = LADDER_COLORS[assignedPlayerIdx % LADDER_COLORS.length];
+    } else {
+      ctx.fillStyle = '#aaa';
+    }
+    ctx.fillText(resultText, pad+i*colW, botY+30);
+  }
+  // 기존 완료 경로 다시 그리기
+  _ldrRevealed.forEach(({idx, path}) => {
+    const color = LADDER_COLORS[idx%LADDER_COLORS.length];
+    ctx.strokeStyle=color; ctx.lineWidth=5;
+    ctx.shadowColor=color; ctx.shadowBlur=8;
+    ctx.beginPath(); ctx.moveTo(path[0][0],path[0][1]);
+    path.slice(1).forEach(p=>ctx.lineTo(p[0],p[1]));
+    ctx.stroke(); ctx.shadowBlur=0;
+  });
+}
+
+function _calcLadderPath(i) {
+  const n=ladderN, pad=_ldrPad, colW=_ldrColW, topY=_ldrTopY, botY=_ldrBotY, STEPS=_ldrSTEPS;
+  let col=i;
+  const path=[[pad+col*colW,topY]];
+  for (let s=0; s<STEPS; s++) {
+    const y=topY+(botY-topY)*(s+1)/(STEPS+1);
+    if (col<n-1 && ladderMap[col][s])      { path.push([pad+col*colW,y]); col++; path.push([pad+col*colW,y]); }
+    else if (col>0 && ladderMap[col-1][s]) { path.push([pad+col*colW,y]); col--; path.push([pad+col*colW,y]); }
+  }
+  path.push([pad+col*colW,botY]);
+  return path;
+}
+
+function _animateLadderPerson(i, onDone) {
+  const path = _calcLadderPath(i);
+  const color = LADDER_COLORS[i%LADDER_COLORS.length];
+  const ctx = _ldrCtx;
+  let seg=0, t=0;
+  const FRAMES=10;
+
+  function step() {
+    _drawBase();
+    // 현재까지 그린 경로
+    ctx.strokeStyle=color; ctx.lineWidth=5;
+    ctx.shadowColor=color; ctx.shadowBlur=12;
+    ctx.beginPath(); ctx.moveTo(path[0][0],path[0][1]);
+    for (let s=0; s<seg; s++) ctx.lineTo(path[s+1][0],path[s+1][1]);
+    if (seg < path.length-1) {
+      const px=path[seg][0]+(path[seg+1][0]-path[seg][0])*(t/FRAMES);
+      const py=path[seg][1]+(path[seg+1][1]-path[seg][1])*(t/FRAMES);
+      ctx.lineTo(px,py);
+    }
+    ctx.stroke(); ctx.shadowBlur=0;
+
+    // 이동 원
+    let cx,cy;
+    if (seg < path.length-1) {
+      cx=path[seg][0]+(path[seg+1][0]-path[seg][0])*(t/FRAMES);
+      cy=path[seg][1]+(path[seg+1][1]-path[seg][1])*(t/FRAMES);
+    } else {
+      cx=path[path.length-1][0]; cy=path[path.length-1][1];
+    }
+    ctx.beginPath(); ctx.arc(cx,cy,9,0,Math.PI*2);
+    ctx.fillStyle=color; ctx.shadowColor=color; ctx.shadowBlur=20;
+    ctx.fill(); ctx.shadowBlur=0;
+    // 이름
+    ctx.fillStyle='#fff'; ctx.font='bold 11px "Noto Sans KR",sans-serif'; ctx.textAlign='center';
+    ctx.fillText(ladderPlayers[i].slice(0,2),cx,cy+4);
+
+    t++;
+    if (t>=FRAMES) { t=0; seg++; }
+    if (seg>=path.length-1) {
+      _ldrRevealed.push({idx:i, path});
+      _drawBase();
+      onDone && onDone();
+      return;
+    }
+    requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+function revealNextResult() {
+  if (_ldrAnim || _ldrIdx >= ladderPlayers.length) return;
+  _ldrAnim = true;
+  document.getElementById('ladder-btn-next').disabled = true;
+  document.getElementById('ladder-btn-all').disabled = true;
+  const i = _ldrIdx;
+  _animateLadderPerson(i, () => {
+    _ldrIdx++;
+    _ldrAnim = false;
+    // 결과 배지
+    const el = document.getElementById('ladder-result-list');
+    const div = document.createElement('div');
+    div.style.cssText='background:#fff;border:1.5px solid #e0deda;border-radius:12px;padding:10px 16px;font-size:14px;animation:popBounce 0.4s both;display:flex;align-items:center;gap:8px;';
+    div.innerHTML=`<span style="color:${LADDER_COLORS[i%LADDER_COLORS.length]};font-weight:700;">${ladderPlayers[i]}</span><span style="color:#bbb;">→</span><span style="font-weight:700;color:#1a1a1a;">${ladderResultsArr[ladderAssignment[i]]||'?'}</span>`;
+    el.appendChild(div);
+    if (_ldrIdx < ladderPlayers.length) {
+      document.getElementById('ladder-btn-next').disabled = false;
+      document.getElementById('ladder-btn-all').disabled = false;
+    }
+  });
+}
+
+function revealAllResults() {
+  if (_ldrAnim) return;
+  // 처음부터 다시
+  _ldrRevealed = []; _ldrIdx = 0;
+  document.getElementById('ladder-result-list').innerHTML = '';
+  _drawBase();
+
+  function next(i) {
+    if (i >= ladderPlayers.length) { _ldrAnim=false; return; }
+    _ldrAnim = true;
+    _animateLadderPerson(i, () => {
+      _ldrIdx++;
+      const el = document.getElementById('ladder-result-list');
+      const div = document.createElement('div');
+      div.style.cssText='background:#fff;border:1.5px solid #e0deda;border-radius:12px;padding:10px 16px;font-size:14px;animation:popBounce 0.4s both;display:flex;align-items:center;gap:8px;';
+      div.innerHTML=`<span style="color:${LADDER_COLORS[i%LADDER_COLORS.length]};font-weight:700;">${ladderPlayers[i]}</span><span style="color:#bbb;">→</span><span style="font-weight:700;color:#1a1a1a;">${ladderResultsArr[ladderAssignment[i]]||'?'}</span>`;
+      el.appendChild(div);
+      setTimeout(()=>next(i+1), 150);
+    });
+  }
+  next(0);
+}
+
+function showLadderResults() { /* drawLadderAnimated에서 처리 */ }
+
+
+function resetLadder(){
+  _ldrRevealed=[]; _ldrIdx=0; _ldrAnim=false;
+  document.getElementById('ladder-setup').style.display='block';
+  document.getElementById('ladder-canvas-wrap').style.display='none';
+  document.getElementById('ladder-result-list').innerHTML='';
+}
+
+// ── 🎋 제비뽑기 (드럼롤 애니메이션) ──────────
+function startLottery(){
+  const raw=document.getElementById('lottery-names').value.trim();
+  const count=parseInt(document.getElementById('lottery-count').value)||1;
+  const noDup=document.getElementById('lottery-no-dup').checked;
+  let pool=[];
+  const rangeMatch=raw.match(/^(\d+)-(\d+)$/);
+  if(rangeMatch){
+    const a=parseInt(rangeMatch[1]),b=parseInt(rangeMatch[2]);
+    for(let i=Math.min(a,b);i<=Math.max(a,b);i++) pool.push(String(i));
+  } else {
+    pool=raw.split('\n').map(s=>s.trim()).filter(Boolean);
+  }
+  if(!pool.length){alert('참가자를 입력해주세요.');return;}
+
+  const picks=[]; const tmp=[...pool];
+  for(let i=0;i<count;i++){
+    if(!tmp.length) break;
+    const idx=Math.floor(Math.random()*tmp.length);
+    picks.push(tmp[idx]);
+    if(noDup) tmp.splice(idx,1);
+  }
+
+  document.getElementById('lottery-setup').style.display='none';
+  document.getElementById('lottery-spinning').style.display='block';
+  document.getElementById('lottery-result').style.display='none';
+  document.getElementById('lottery-result-list').innerHTML='';
+
+  // 드럼롤: 빠르게 랜덤 이름 돌리다가 결과로 확정
+  function spinOnePick(pickIdx){
+    if(pickIdx>=picks.length){
+      document.getElementById('lottery-spinning').style.display='none';
+      document.getElementById('lottery-result').style.display='block';
+      return;
+    }
+    const spinEl=document.getElementById('lottery-spin-display');
+    let frame=0; const totalFrames=30;
+    const spinInterval=setInterval(()=>{
+      const rand=pool[Math.floor(Math.random()*pool.length)];
+      spinEl.textContent=rand;
+      spinEl.style.fontSize=frame<15?'clamp(40px,8vw,80px)':'clamp(60px,12vw,100px)';
+      frame++;
+      if(frame>=totalFrames){
+        clearInterval(spinInterval);
+        spinEl.textContent=picks[pickIdx];
+        spinEl.style.fontSize='clamp(60px,12vw,120px)';
+        spinEl.style.color='#1a1aaa';
+        // 결과 배지 추가
+        setTimeout(()=>{
+          const el=document.getElementById('lottery-result-list');
+          const div=document.createElement('div');
+          div.className='lottery-badge-light';
+          div.style.animationDelay=(pickIdx*0.05)+'s';
+          div.innerHTML=`${count>1?`<div class="lottery-badge-rank">${pickIdx+1}번째</div>`:''}
+            <div class="lottery-badge-name">${picks[pickIdx]}</div>`;
+          el.appendChild(div);
+          spinEl.style.color='#1a1a1a';
+          setTimeout(()=>spinOnePick(pickIdx+1), 400);
+        }, 600);
+      }
+    }, frame<20 ? 40 : 80);
+  }
+  setTimeout(()=>spinOnePick(0), 200);
+}
+
+function resetLottery(){
+  document.getElementById('lottery-setup').style.display='block';
+  document.getElementById('lottery-spinning').style.display='none';
+  document.getElementById('lottery-result').style.display='none';
+  document.getElementById('lottery-result-list').innerHTML='';
+}
+
+window.addEventListener('resize', () => {
+  if (_resizeTimer) clearTimeout(_resizeTimer);
+  _resizeTimer = setTimeout(() => {
+    if (currentDisplayMode === 'compact') calcCompactCellHeight();
+  }, 150);
+});
+let _resizeTimer = null;
+
+// ── 컴팩트 모드 툴팁 마우스 위치 추적 (PC 전용, 스로틀링 적용) ─────
+let _tooltipRaf = false;
+document.addEventListener('mousemove', (e) => {
+  if (_tooltipRaf) return;
+  _tooltipRaf = true;
+  requestAnimationFrame(() => {
+    _tooltipRaf = false;
+    if (currentDisplayMode !== 'compact') return;
+    const tooltip = document.querySelector('.compact-mode .day-cell:hover .cal-tooltip');
+    if (!tooltip) return;
+    const gap = 14;
+    const tw = tooltip.offsetWidth || 200;
+    const th = tooltip.offsetHeight || 100;
+    let x = e.clientX + gap;
+    let y = e.clientY + gap;
+    if (x + tw > window.innerWidth - 8)  x = e.clientX - tw - gap;
+    if (y + th > window.innerHeight - 8) y = e.clientY - th - gap;
+    tooltip.style.left = x + 'px';
+    tooltip.style.top  = y + 'px';
+  });
+});
+
+// ── 설정 저장/복원 ───────────────────────────
+function saveSettings() {
+  localStorage.setItem('cal-settings', JSON.stringify({
+    displayMode: currentDisplayMode,
+    navMode:     currentNavMode,
+    viewMode:    currentViewMode,
+    font:        currentFont,
+  }));
+}
+
+function loadSettings() {
+  try {
+    const s = JSON.parse(localStorage.getItem('cal-settings'));
+    if (!s) return;
+
+    // ── 상태 변수만 조용히 복원 (buildCalendar 호출 없음) ──
+
+    // 표시 모드
+    if (s.displayMode) {
+      currentDisplayMode = s.displayMode;
+      document.querySelectorAll('#mode-full,#mode-compact').forEach(b => b.classList.remove('active'));
+      document.getElementById('mode-' + s.displayMode)?.classList.add('active');
+      applyLayout(); // CSS/레이아웃만 적용
+    }
+
+    // 탐색 방식
+    if (s.navMode) {
+      currentNavMode = s.navMode;
+      document.querySelectorAll('#nav-scroll,#nav-page').forEach(b => b.classList.remove('active'));
+      document.getElementById('nav-' + s.navMode)?.classList.add('active');
+      const pageGroup = document.getElementById('page-nav-group');
+      if (s.navMode === 'page') {
+        pageGroup.style.display = '';
+        const today = new Date();
+        pageIdx = MONTHS.findIndex(m => m.y === today.getFullYear() && m.m === today.getMonth());
+        if (pageIdx < 0) pageIdx = 0;
+      } else {
+        pageGroup.style.display = 'none';
+      }
+    }
+
+    // 보기 필터
+    if (s.viewMode) {
+      currentViewMode = s.viewMode;
+      const map = {all:'view-all', g3:'view-g3', school:'view-school'};
+      document.querySelectorAll('#view-all,#view-g3,#view-school').forEach(b => b.classList.remove('active'));
+      document.getElementById(map[s.viewMode])?.classList.add('active');
+    }
+
+    // 글씨 크기
+    if (s.font) applyFont(s.font);
+
+  } catch(e) { console.log('설정 복원 오류:', e); }
+}
+
+loadColors();
+applyZoom(currentZoom);
+loadData();
+
+// ── PWA Service Worker 등록 ──────────────────
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(() => console.log('SW 등록 완료'))
+      .catch(e => console.log('SW 등록 실패:', e));
+  });
+}
+
+// ── 가정통신문 ───────────────────────────────
+const NEWS_URL = 'https://myys-h.goesw.kr/myys-h/na/ntt/selectNttList.do?mi=17174&bbsId=10012';
+
+function openNewsPopup() {
+  document.getElementById('news-overlay').classList.add('open');
+  loadNews();
+}
+function closeNewsPopup(e) {
+  if (e.target === document.getElementById('news-overlay'))
+    document.getElementById('news-overlay').classList.remove('open');
+}
+
+async function loadNews() {
+  const el = document.getElementById('news-list');
+  el.innerHTML = '<span class="neis-empty">불러오는 중...</span>';
+  try {
+    const res  = await fetch(NEWS_URL);
+    const html = await res.text();
+    const parser = new DOMParser();
+    const doc  = parser.parseFromString(html, 'text/html');
+    const rows = doc.querySelectorAll('table tbody tr');
+    if (!rows.length) {
+      el.innerHTML = '<span class="neis-empty">목록을 불러올 수 없습니다.</span>';
+      return;
+    }
+    const items = [];
+    rows.forEach(row => {
+      const cells = row.querySelectorAll('td');
+      if (cells.length < 4) return;
+      const titleCell = cells[1];
+      const date      = cells[3]?.textContent.trim() || '';
+      const titleText = titleCell?.textContent.trim() || '';
+      items.push({ title: titleText, date });
+    });
+    if (!items.length) {
+      el.innerHTML = '<span class="neis-empty">목록을 불러올 수 없습니다.</span>';
+      return;
+    }
+    el.innerHTML = items.map(item =>
+      `<div class="g3-item" onclick="window.open('${NEWS_URL}','_blank')" style="cursor:pointer;">
+        <div class="g3-date-col">
+          <div class="g3-dow" style="font-size:11px;color:#888;">${item.date}</div>
+        </div>
+        <div class="g3-content">
+          <div class="g3-text" style="font-size:13px;">${item.title}</div>
+        </div>
+      </div>`
+    ).join('');
+  } catch(e) {
+    el.innerHTML = '<span class="neis-empty">불러오기 실패 — CORS 제한으로 직접 접근이 어렵습니다.<br><a href="' + NEWS_URL + '" target="_blank" style="color:#185FA5;">홈페이지에서 보기 →</a></span>';
+  }
+}
+
+// ── NEIS 급식/시간표 ──────────────────────────
+function openMealPopup() {
+  document.getElementById('meal-overlay').classList.add('open');
+  loadMeal(mealOffset);
+}
+function closeMealPopup(e) {
+  if(e.target===document.getElementById('meal-overlay'))
+    document.getElementById('meal-overlay').classList.remove('open');
+}
+function openTTPopup() {
+  document.getElementById('tt-overlay').classList.add('open');
+  renderClassSelect();
+  if(ttClass) loadTimetable(ttOffset);
+}
+function closeTTPopup(e) {
+  if(e.target===document.getElementById('tt-overlay'))
+    document.getElementById('tt-overlay').classList.remove('open');
+}
+const NEIS_KEY    = 'cd3ab4ea893c40b58a4571c4e1b987da';
+const NEIS_ATPT   = 'J10';   // 경기도
+const NEIS_SD     = '7530195'; // 영생고등학교
+
+// 날짜 유틸
+function toYMD(d) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const day = String(d.getDate()).padStart(2,'0');
+  return `${y}${m}${day}`;
+}
+function fmtLabel(d) {
+  const days = ['일','월','화','수','목','금','토'];
+  return `${d.getMonth()+1}/${d.getDate()} (${days[d.getDay()]})`;
+}
+
+// ── 급식 ──────────────────────────────────────
+let mealOffset = 0;
+
+async function loadMeal(offset) {
+  mealOffset = offset;
+  const d = new Date(); d.setDate(d.getDate() + offset);
+  document.getElementById('meal-date-label').textContent = fmtLabel(d);
+  const el = document.getElementById('meal-content');
+  el.innerHTML = '<span class="neis-empty">불러오는 중...</span>';
+  try {
+    const url = `https://open.neis.go.kr/hub/mealServiceDietInfo?KEY=${NEIS_KEY}&Type=json&pIndex=1&pSize=5&ATPT_OFCDC_SC_CODE=${NEIS_ATPT}&SD_SCHUL_CODE=${NEIS_SD}&MLSV_YMD=${toYMD(d)}`;
+    const res  = await fetch(url);
+    const json = await res.json();
+    const rows = json?.mealServiceDietInfo?.[1]?.row;
+    if (!rows || !rows.length) {
+      el.innerHTML = '<span class="neis-empty">급식 정보가 없습니다.</span>';
+      return;
+    }
+    el.innerHTML = rows.map(r => {
+      const menus = r.DDISH_NM.replace(/<br\/>/g, '\n').split('\n').map(m => m.replace(/\([\d.]+\)/g,'').trim()).filter(Boolean);
+      const kcal  = r.CAL_INFO || '';
+      return `<div style="margin-bottom:8px;">
+        <div style="font-size:11px;font-weight:700;color:#888;margin-bottom:4px;">${r.MMEAL_SC_NM} ${kcal ? '· '+kcal : ''}</div>
+        ${menus.map(m=>`<div class="menu-item">${m}</div>`).join('')}
+      </div>`;
+    }).join('');
+  } catch(e) {
+    el.innerHTML = '<span class="neis-empty">불러오기 실패</span>';
+  }
+}
+
+function changeMealDate(d) { loadMeal(mealOffset + d); }
+
+// ── 시간표 ────────────────────────────────────
+let ttOffset = 0;
+let ttGrade  = 3;
+let ttClass  = 1;
+
+function renderClassSelect() {
+  const sel = document.getElementById('tt-class-select');
+  const grades = [1,2,3];
+  const classes = [1,2,3,4,5,6,7,8,9,10,11];
+  sel.innerHTML =
+    // 학년 선택
+    `<div style="display:flex;gap:4px;margin-bottom:6px;width:100%;">` +
+    grades.map(g =>
+      `<button class="neis-class-btn ${g===ttGrade?'active':''}"
+        style="${g===ttGrade?'background:#185FA5;border-color:#185FA5;':''}"
+        onclick="selectGrade(${g})">${g}학년</button>`
+    ).join('') +
+    `</div>` +
+    // 반 선택
+    `<div style="display:flex;gap:4px;flex-wrap:wrap;">` +
+    classes.map(c =>
+      `<button class="neis-class-btn ${c===ttClass?'active':''}" onclick="selectClass(${c})">${c}반</button>`
+    ).join('') +
+    `</div>`;
+}
+
+function selectGrade(g) {
+  ttGrade = g;
+  renderClassSelect();
+  loadTimetable(ttOffset);
+}
+
+function selectClass(c) {
+  ttClass = c;
+  renderClassSelect();
+  loadTimetable(ttOffset);
+}
+
+async function loadTimetable(offset) {
+  ttOffset = offset;
+  const d = new Date(); d.setDate(d.getDate() + offset);
+  // 주말이면 다음 월요일로
+  if (d.getDay() === 0) d.setDate(d.getDate() + 1);
+  if (d.getDay() === 6) d.setDate(d.getDate() + 2);
+  document.getElementById('tt-date-label').textContent = fmtLabel(d);
+  const el = document.getElementById('tt-content');
+  el.innerHTML = '<span class="neis-empty">불러오는 중...</span>';
+  try {
+    const url = `https://open.neis.go.kr/hub/hisTimetable?KEY=${NEIS_KEY}&Type=json&pIndex=1&pSize=10&ATPT_OFCDC_SC_CODE=${NEIS_ATPT}&SD_SCHUL_CODE=${NEIS_SD}&ALL_TI_YMD=${toYMD(d)}&GRADE=${ttGrade}&CLASS_NM=${ttClass}`;
+    const res  = await fetch(url);
+    const json = await res.json();
+    const rows = json?.hisTimetable?.[1]?.row;
+    if (!rows || !rows.length) {
+      el.innerHTML = '<span class="neis-empty">시간표 정보가 없습니다.</span>';
+      return;
+    }
+    const sorted = rows.sort((a,b) => parseInt(a.PERIO)-parseInt(b.PERIO));
+    el.innerHTML = `<div class="timetable-grid">` +
+      sorted.map(r =>
+        `<div class="timetable-row">
+          <div class="timetable-period">${r.PERIO}교시</div>
+          <div class="timetable-subj">${r.ITRT_CNTNT}</div>
+        </div>`
+      ).join('') + `</div>`;
+  } catch(e) {
+    el.innerHTML = '<span class="neis-empty">불러오기 실패</span>';
+  }
+}
+
+function changeTTDate(d) { loadTimetable(ttOffset + d); }
+
+// 시간표 반 선택 초기화
+renderClassSelect();
+
+</script>
+</body>
+</html>
