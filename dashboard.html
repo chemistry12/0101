@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chemy</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&family=Noto+Serif+KR:wght@300;400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #f2f4f7;
+  --white:    #ffffff;
+  --border:   #e8eaed;
+  --border2:  #d1d5db;
+  --text:     #111827;
+  --text2:    #6b7280;
+  --text3:    #9ca3af;
+  --blue:     #1d6bf3;
+  --blue-dk:  #1558d6;
+  --blue-bg:  #eff5ff;
+  --blue-lt:  #dbeafe;
+  --green:    #059669;
+  --green-bg: #ecfdf5;
+  --green-lt: #d1fae5;
+  --amber:    #d97706;
+  --amber-bg: #fffbeb;
+  --amber-lt: #fde68a;
+  --purple:   #7c3aed;
+  --purple-bg:#f5f3ff;
+  --purple-lt:#ede9fe;
+  --red:      #dc2626;
+  --red-bg:   #fef2f2;
+  --r:   10px;
+  --rsm: 6px;
+  --shadow: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+  --shadow-md: 0 4px 16px rgba(0,0,0,.08), 0 1px 4px rgba(0,0,0,.04);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 13px;
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+/* ══════════════════════════════════════
+   HEADER
+══════════════════════════════════════ */
+.hdr {
+  background: var(--blue);
+  padding: 0 28px;
+  height: 52px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 200;
+}
+.logo {
+  font-family: 'DM Mono', monospace;
+  font-size: 18px; font-weight: 500;
+  color: #fff; letter-spacing: .04em;
+}
+.hdr-center { display: flex; align-items: center; gap: 12px; }
+.clock {
+  font-family: 'DM Mono', monospace;
+  font-size: 20px; font-weight: 500;
+  color: #fff; letter-spacing: .02em;
+}
+.date-pill {
+  font-size: 12px; font-family: 'DM Mono', monospace;
+  color: rgba(255,255,255,.85);
+  background: rgba(255,255,255,.15);
+  padding: 3px 11px; border-radius: 20px;
+  border: 1px solid rgba(255,255,255,.2);
+}
+.hdr-right { display: flex; align-items: center; gap: 8px; }
+.sync-pill {
+  font-size: 11px; font-weight: 600;
+  padding: 3px 10px; border-radius: 20px;
+  display: inline-flex; align-items: center; gap: 5px;
+  border: 1px solid rgba(255,255,255,.25);
+  background: rgba(255,255,255,.12);
+  color: rgba(255,255,255,.9);
+  transition: all .2s;
+}
+.sync-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+.sync-pill.synced  { background: rgba(255,255,255,.2); color: #fff; }
+.sync-pill.syncing { background: rgba(255,255,255,.1); color: rgba(255,255,255,.7); }
+.sync-pill.error   { background: rgba(220,38,38,.3); color: #fca5a5; }
+.hdr-btn {
+  font-size: 12px; font-weight: 500; font-family: inherit;
+  padding: 6px 14px; border-radius: var(--rsm);
+  border: 1px solid rgba(255,255,255,.35);
+  background: rgba(255,255,255,.15);
+  color: #fff; cursor: pointer; transition: all .15s;
+}
+.hdr-btn:hover { background: rgba(255,255,255,.28); border-color: rgba(255,255,255,.5); }
+
+/* ══════════════════════════════════════
+   LAYOUT
+══════════════════════════════════════ */
+.wrap { padding: 20px 24px; display: flex; flex-direction: column; gap: 16px; max-width: 1440px; margin: 0 auto; }
+
+.main-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+/* ── 반응형 ── */
+@media (max-width: 900px) {
+  .wrap { padding: 12px 14px; gap: 12px; }
+  .main-grid { grid-template-columns: 1fr; }
+  .hdr { padding: 0 14px; height: 48px; }
+  .hdr-center { gap: 8px; }
+  .clock { font-size: 16px; }
+  .date-pill { font-size: 11px; padding: 2px 8px; }
+  .sync-pill { display: none; }
+  .hdr-btn { font-size: 11px; padding: 5px 10px; }
+  .tt-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .card { padding: 14px 14px; }
+}
+@media (max-width: 480px) {
+  .logo { font-size: 15px; }
+  .clock { font-size: 15px; }
+  .date-pill { display: none; }
+  .hdr-btn { font-size: 10px; padding: 4px 8px; }
+}
+
+/* ══════════════════════════════════════
+   CARD
+══════════════════════════════════════ */
+.card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  box-shadow: var(--shadow);
+  padding: 18px 20px;
+  display: flex; flex-direction: column; gap: 14px;
+}
+.card-title {
+  font-size: 12px; font-weight: 700;
+  letter-spacing: .06em; text-transform: uppercase;
+  color: var(--text2);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.card-title-left { display: flex; align-items: center; gap: 7px; }
+.drag-handle {
+  cursor: grab; color: var(--text3); font-size: 15px;
+  opacity: .35; transition: opacity .15s; line-height: 1;
+  user-select: none; flex-shrink: 0;
+}
+.drag-handle:hover { opacity: .75; }
+.drag-handle:active { cursor: grabbing; }
+.card.dragging { opacity: .35; box-shadow: none; }
+.card.drag-over { outline: 2px dashed var(--blue); outline-offset: 3px; background: var(--blue-bg); }
+.card-title-text { cursor: default; }
+.card-title-text:hover { color: var(--text); }
+.badge {
+  font-size: 10px; font-weight: 700;
+  padding: 2px 8px; border-radius: 20px;
+  letter-spacing: .02em;
+}
+.badge-blue   { background: var(--blue-bg);   color: var(--blue); }
+.badge-green  { background: var(--green-bg);  color: var(--green); }
+.badge-purple { background: var(--purple-bg); color: var(--purple); }
+.badge-amber  { background: var(--amber-bg);  color: var(--amber); }
+
+/* ══════════════════════════════════════
+   CALENDAR
+══════════════════════════════════════ */
+.cal-nav-row {
+  display: flex; align-items: center; justify-content: space-between;
+}
+.cal-month {
+  font-size: 16px; font-weight: 600; letter-spacing: -.02em;
+}
+.cal-nav { display: flex; gap: 4px; }
+.cal-nav button {
+  width: 26px; height: 26px;
+  border: 1px solid var(--border2); border-radius: var(--rsm);
+  background: var(--white); cursor: pointer; font-size: 14px; color: var(--text2);
+  display: flex; align-items: center; justify-content: center; transition: all .15s;
+}
+.cal-nav button:hover { background: var(--blue); color: #fff; border-color: var(--blue); }
+.cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; }
+.cal-dow {
+  text-align: center; font-size: 10px; font-weight: 700;
+  color: var(--text3); padding: 4px 0 6px; letter-spacing: .04em;
+}
+.cal-dow:first-child { color: #ef4444; }
+.cal-dow:last-child  { color: var(--blue); }
+.cal-day {
+  text-align: center; font-size: 12.5px;
+  padding: 6px 2px; border-radius: var(--rsm);
+  cursor: pointer; transition: background .12s;
+  position: relative; line-height: 1;
+}
+.cal-day:hover { background: var(--blue-bg); }
+.cal-day.other  { color: var(--text3); }
+.cal-day.today  {
+  background: var(--blue); color: #fff; font-weight: 700;
+  box-shadow: 0 2px 8px rgba(29,107,243,.35);
+}
+.cal-day.sun    { color: #ef4444; }
+.cal-day.sat    { color: var(--blue); }
+.cal-day.today.sun, .cal-day.today.sat { color: #fff; }
+.cal-day.has-ev::after {
+  content: ''; width: 4px; height: 4px; border-radius: 50%;
+  background: var(--amber);
+  position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%);
+}
+.cal-day.today.has-ev::after { background: rgba(255,255,255,.8); }
+
+/* ══════════════════════════════════════
+   TIMETABLE
+══════════════════════════════════════ */
+.tt-badge { font-size: 10px; font-weight: 700; padding: 2px 9px; border-radius: 20px; }
+.tt-badge-0 { background: #fef9c3; color: #78350f; }
+.tt-badge-1 { background: var(--green-lt); color: #065f46; }
+
+.tt-wrap { overflow: hidden; }
+.tt { width: 100%; border-collapse: collapse; font-size: 9px; table-layout: fixed; }
+.tt th {
+  padding: 3px 2px; text-align: center;
+  font-size: 8px; font-weight: 700; letter-spacing: .04em; color: var(--text3);
+  border-bottom: 1.5px solid var(--border);
+}
+.tt th.th-today { color: var(--blue); }
+.tt td { padding: 1px 1px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+.tt td.p-col {
+  font-family: 'DM Mono', monospace;
+  color: var(--text3); width: 28px; text-align: center;
+  padding: 1px 2px; line-height: 1;
+}
+.tt td.t-col { background: #f0f5ff; }
+.tt-cell {
+  min-height: 17px; padding: 1px 2px; border-radius: 3px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 0; cursor: pointer; transition: opacity .15s, transform .1s;
+}
+.tt-cell:hover { opacity: .85; transform: scale(.97); }
+.tt-cell.empty { background: #f9fafb; min-height: 17px; }
+.tt-cell.empty:hover { background: var(--border); }
+.tt-cell-name { font-size: 9px; font-weight: 700; text-align: center; line-height: 1.2; color: #111827 !important; }
+.tt-cell-sub  { font-size: 7.5px; text-align: center; line-height: 1.1; color: #374151 !important; opacity: 1; }
+
+/* ══════════════════════════════════════
+   EVENTS
+══════════════════════════════════════ */
+.ev-input-row { display: flex; gap: 6px; flex-wrap: wrap; }
+.ev-input-row input, .ev-input-row select {
+  flex: 1; min-width: 70px; padding: 7px 10px;
+  border: 1px solid var(--border2); border-radius: var(--rsm);
+  font-size: 12px; font-family: inherit;
+  background: #fff; color: var(--text); outline: none;
+  transition: border-color .15s, box-shadow .15s;
+}
+.ev-input-row input:focus, .ev-input-row select:focus {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(29,107,243,.1);
+}
+.ev-list { display: flex; flex-direction: column; gap: 4px; }
+.ev-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 12px; border-radius: var(--rsm);
+  background: #f9fafb;
+  border-left: 3px solid transparent;
+  transition: background .12s;
+}
+.ev-row:hover { background: var(--blue-bg); }
+.ev-row.c-blue   { border-color: var(--blue); }
+.ev-row.c-green  { border-color: var(--green); }
+.ev-row.c-amber  { border-color: var(--amber); }
+.ev-row.c-purple { border-color: var(--purple); }
+.ev-row.c-red    { border-color: var(--red); }
+.ev-date  { font-family: 'DM Mono', monospace; font-size: 10.5px; color: var(--text3); flex-shrink: 0; min-width: 38px; }
+.ev-name  { flex: 1; font-size: 12.5px; font-weight: 500; }
+.ev-diff  { font-size: 10.5px; font-weight: 600; padding: 1px 6px; border-radius: 20px; flex-shrink: 0; }
+.ev-diff.today  { background: var(--blue-bg); color: var(--blue); }
+.ev-diff.soon   { background: var(--amber-bg); color: var(--amber); }
+.ev-diff.past   { background: #f3f4f6; color: var(--text3); }
+.ev-diff.future { background: var(--blue-bg); color: var(--blue); }
+
+/* ══════════════════════════════════════
+   LINKS
+══════════════════════════════════════ */
+.link-input-row { display: flex; gap: 6px; flex-wrap: wrap; }
+.link-input-row input, .link-input-row select {
+  flex: 1; min-width: 60px; padding: 7px 10px;
+  border: 1px solid var(--border2); border-radius: var(--rsm);
+  font-size: 12px; font-family: inherit;
+  background: #fff; color: var(--text); outline: none;
+  transition: border-color .15s, box-shadow .15s;
+}
+.link-input-row input:focus, .link-input-row select:focus {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(29,107,243,.1);
+}
+.link-list { display: flex; flex-direction: column; gap: 2px; }
+.link-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 10px; border-radius: var(--rsm);
+  transition: background .12s; cursor: default;
+}
+.link-row:hover { background: var(--blue-bg); }
+.link-tag {
+  font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px; flex-shrink: 0;
+}
+.tag-수업  { background: var(--green-bg);  color: var(--green); }
+.tag-EBS   { background: var(--blue-bg);   color: var(--blue); }
+.tag-자료  { background: var(--amber-bg);  color: var(--amber); }
+.tag-기타  { background: #f3f4f6;          color: var(--text2); }
+.tag-입시  { background: var(--purple-bg); color: var(--purple); }
+.tag-공지  { background: var(--red-bg);    color: var(--red); }
+.tag-수능  { background: var(--purple-bg); color: var(--purple); }
+.tag-원서  { background: var(--red-bg);    color: var(--red); }
+.tag-유용  { background: var(--blue-bg);   color: var(--blue); }
+.link-name {
+  flex: 1; font-size: 12.5px; font-weight: 500; color: var(--blue);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;
+}
+.link-name:hover { text-decoration: underline; }
+
+/* ══════════════════════════════════════
+   COMMON BUTTONS
+══════════════════════════════════════ */
+.btn {
+  padding: 7px 16px; border-radius: var(--rsm);
+  border: none; background: var(--blue); color: #fff;
+  font-size: 12px; font-weight: 600; font-family: inherit;
+  cursor: pointer; transition: background .15s;
+}
+.btn:hover { background: var(--blue-dk); }
+.btn-sm {
+  font-size: 11px; font-weight: 600; padding: 4px 11px; border-radius: var(--rsm);
+  border: 1px solid var(--border2); background: var(--white);
+  color: var(--text2); cursor: pointer; font-family: inherit; transition: all .15s;
+}
+.btn-sm:hover { background: var(--blue); color: #fff; border-color: var(--blue); }
+.btn-outline {
+  padding: 7px 14px; border-radius: var(--rsm);
+  border: 1px solid var(--border2); background: var(--white);
+  color: var(--text2); font-size: 12px; font-family: inherit;
+  cursor: pointer; transition: all .15s;
+}
+.btn-outline:hover { background: #f3f4f6; }
+.btn-ghost-red {
+  padding: 7px 12px; border-radius: var(--rsm);
+  border: 1px solid var(--border2); background: none;
+  color: var(--red); font-size: 12px; font-family: inherit; cursor: pointer;
+}
+.btn-ghost-red:hover { background: var(--red-bg); border-color: var(--red); }
+.del-x {
+  background: none; border: none; color: var(--text3);
+  cursor: pointer; font-size: 15px; padding: 0 2px; line-height: 1; flex-shrink: 0;
+  transition: color .12s;
+}
+.del-x:hover { color: var(--red); }
+.empty-msg { font-size: 12px; color: var(--text3); text-align: center; padding: 12px 0; }
+
+/* ══════════════════════════════════════
+   OVERLAYS
+══════════════════════════════════════ */
+.overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(17,24,39,.4);
+  z-index: 400; align-items: center; justify-content: center;
+  backdrop-filter: blur(2px);
+}
+.overlay.open { display: flex; }
+.dialog {
+  background: var(--white);
+  border-radius: 14px; padding: 28px;
+  width: 480px; max-width: 94vw;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
+}
+.dialog h2 { font-size: 16px; font-weight: 700; margin-bottom: 5px; }
+.dialog p  { font-size: 13px; color: var(--text2); line-height: 1.7; margin-bottom: 18px; }
+.steps { background: #f9fafb; border-radius: var(--rsm); padding: 14px 18px; margin-bottom: 18px; counter-reset: s; }
+.step  { font-size: 12.5px; color: var(--text2); line-height: 2; display: flex; gap: 8px; counter-increment: s; }
+.step::before {
+  content: counter(s); font-size: 10px; font-weight: 700; color: var(--blue);
+  background: var(--blue-bg); min-width: 18px; height: 18px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; margin-top: 5px; flex-shrink: 0;
+}
+.step b { color: var(--text); font-weight: 600; }
+.url-field {
+  width: 100%; padding: 10px 13px;
+  border: 1.5px solid var(--border2); border-radius: var(--rsm);
+  font-size: 13px; font-family: 'DM Mono', monospace;
+  color: var(--text); background: #f9fafb; outline: none; margin-bottom: 16px;
+  transition: border-color .15s, box-shadow .15s;
+}
+.url-field:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(29,107,243,.1); background: #fff; }
+.dialog-btns { display: flex; gap: 8px; justify-content: flex-end; }
+
+.mini-dialog {
+  background: var(--white);
+  border-radius: 12px; padding: 22px;
+  width: 310px;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
+  display: flex; flex-direction: column; gap: 12px;
+}
+.mini-dialog h3 { font-size: 14px; font-weight: 700; }
+.field { display: flex; flex-direction: column; gap: 4px; }
+.field label { font-size: 10px; font-weight: 700; color: var(--text2); letter-spacing: .06em; text-transform: uppercase; }
+.field input, .field select {
+  padding: 8px 11px; border: 1.5px solid var(--border2); border-radius: var(--rsm);
+  font-size: 12.5px; font-family: inherit; background: #f9fafb; color: var(--text); outline: none;
+  transition: border-color .15s, box-shadow .15s;
+}
+.field input:focus, .field select:focus {
+  border-color: var(--blue); background: #fff;
+  box-shadow: 0 0 0 3px rgba(29,107,243,.1);
+}
+.mini-btns { display: flex; gap: 6px; margin-top: 4px; }
+</style>
+</head>
+<body>
+
+<!-- ── 헤더 ── -->
+<header class="hdr">
+  <div class="logo">Chemy</div>
+  <div class="hdr-center">
+    <div class="clock" id="clock">00:00:00</div>
+    <div class="date-pill" id="date-pill"></div>
+  </div>
+  <div class="hdr-right">
+    <div class="sync-pill local" id="sync-pill">
+      <span class="sync-dot"></span><span id="sync-txt">로컬 모드</span>
+    </div>
+    <button class="hdr-btn" id="sheet-btn" onclick="openSheet()" style="display:none">시트 열기</button>
+    <button class="hdr-btn" onclick="openOv('setup-ov')">Google Sheets 연동</button>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="main-grid" id="main-grid">
+
+    <!-- 달력 -->
+    <div class="card" id="cal-card" data-card-id="cal">
+      <div class="card-title">
+        <span class="card-title-left">
+          <span class="drag-handle" title="드래그하여 이동">⠿</span>
+          <span class="card-title-text" ondblclick="editTitle(this,'cal')">📅 달력</span>
+        </span>
+      </div>
+      <div class="cal-nav-row">
+        <div class="cal-month" id="cal-month"></div>
+        <div class="cal-nav">
+          <button onclick="moveMonth(-1)">‹</button>
+          <button onclick="moveMonth(0)">●</button>
+          <button onclick="moveMonth(1)">›</button>
+        </div>
+      </div>
+      <div class="cal-grid" id="cal-grid"></div>
+    </div>
+
+    <!-- 시간표 0 -->
+    <div class="card" id="tt-card-0" data-card-id="tt0">
+      <div class="card-title">
+        <span class="card-title-left">
+          <span class="drag-handle" title="드래그하여 이동">⠿</span>
+          <span class="card-title-text" ondblclick="editTitle(this,'tt0')">🗓 시간표</span>
+          <span class="tt-badge tt-badge-0">화학Ⅱ 반</span>
+        </span>
+      </div>
+      <div class="tt-wrap">
+        <table class="tt"><thead id="tt-head-0"></thead><tbody id="tt-body-0"></tbody></table>
+      </div>
+    </div>
+
+    <!-- 시간표 1 -->
+    <div class="card" id="tt-card-1" data-card-id="tt1">
+      <div class="card-title">
+        <span class="card-title-left">
+          <span class="drag-handle" title="드래그하여 이동">⠿</span>
+          <span class="card-title-text" ondblclick="editTitle(this,'tt1')">🗓 시간표</span>
+          <span class="tt-badge tt-badge-1">실험 반</span>
+        </span>
+      </div>
+      <div class="tt-wrap">
+        <table class="tt"><thead id="tt-head-1"></thead><tbody id="tt-body-1"></tbody></table>
+      </div>
+    </div>
+
+    <!-- 일정 -->
+    <div class="card" data-card-id="events">
+      <div class="card-title">
+        <span class="card-title-left">
+          <span class="drag-handle" title="드래그하여 이동">⠿</span>
+          <span class="card-title-text" ondblclick="editTitle(this,'events')">📌 일정</span>
+          <span class="badge badge-blue">캘린더</span>
+        </span>
+        <button class="btn-sm" onclick="openEvModal('')">+ 추가</button>
+      </div>
+      <div class="ev-input-row">
+        <input type="date" id="ev-q-date" style="max-width:134px"/>
+        <input id="ev-q-text" placeholder="일정 내용" onkeydown="if(event.key==='Enter')quickEv()"/>
+        <select id="ev-q-color" style="max-width:62px">
+          <option value="c-blue">파랑</option>
+          <option value="c-amber">노랑</option>
+          <option value="c-green">초록</option>
+          <option value="c-purple">보라</option>
+          <option value="c-red">빨강</option>
+        </select>
+        <button class="btn" onclick="quickEv()">추가</button>
+      </div>
+      <div class="ev-list" id="ev-list"></div>
+    </div>
+
+    <!-- 수업 -->
+    <div class="card" data-card-id="cls">
+      <div class="card-title">
+        <span class="card-title-left">
+          <span class="drag-handle" title="드래그하여 이동">⠿</span>
+          <span class="card-title-text" ondblclick="editTitle(this,'cls')">📚 수업</span>
+          <span class="badge badge-green">학교·수업</span>
+        </span>
+      </div>
+      <div class="link-input-row">
+        <input id="cls-url" placeholder="URL"/>
+        <input id="cls-name" placeholder="이름" style="max-width:80px"/>
+        <select id="cls-tag" style="max-width:60px">
+          <option value="수업">수업</option>
+          <option value="EBS">EBS</option>
+          <option value="자료">자료</option>
+          <option value="기타">기타</option>
+        </select>
+        <button class="btn" onclick="addLink('cls')">추가</button>
+      </div>
+      <div class="link-list" id="cls-list"></div>
+    </div>
+
+    <!-- 3학년부 -->
+    <div class="card" data-card-id="adm">
+      <div class="card-title">
+        <span class="card-title-left">
+          <span class="drag-handle" title="드래그하여 이동">⠿</span>
+          <span class="card-title-text" ondblclick="editTitle(this,'adm')">🎯 3학년부</span>
+          <span class="badge badge-purple">입시·수능</span>
+        </span>
+      </div>
+      <div class="link-input-row">
+        <input id="adm-url" placeholder="URL"/>
+        <input id="adm-name" placeholder="이름" style="max-width:80px"/>
+        <select id="adm-tag" style="max-width:60px">
+          <option value="입시">입시</option>
+          <option value="공지">공지</option>
+          <option value="자료">자료</option>
+          <option value="기타">기타</option>
+        </select>
+        <button class="btn" onclick="addLink('adm')">추가</button>
+      </div>
+      <div class="link-list" id="adm-list"></div>
+    </div>
+
+    <!-- 대입 -->
+    <div class="card" data-card-id="daip">
+      <div class="card-title">
+        <span class="card-title-left">
+          <span class="drag-handle" title="드래그하여 이동">⠿</span>
+          <span class="card-title-text" ondblclick="editTitle(this,'daip')">🏫 대입</span>
+          <span class="badge badge-amber">수능·원서</span>
+        </span>
+      </div>
+      <div class="link-input-row">
+        <input id="daip-url" placeholder="URL"/>
+        <input id="daip-name" placeholder="이름" style="max-width:80px"/>
+        <select id="daip-tag" style="max-width:60px">
+          <option value="수능">수능</option>
+          <option value="원서">원서</option>
+          <option value="자료">자료</option>
+          <option value="기타">기타</option>
+        </select>
+        <button class="btn" onclick="addLink('daip')">추가</button>
+      </div>
+      <div class="link-list" id="daip-list"></div>
+    </div>
+
+    <!-- 기타 -->
+    <div class="card" data-card-id="etc">
+      <div class="card-title">
+        <span class="card-title-left">
+          <span class="drag-handle" title="드래그하여 이동">⠿</span>
+          <span class="card-title-text" ondblclick="editTitle(this,'etc')">🔗 기타</span>
+          <span class="badge badge-blue">유용한 링크</span>
+        </span>
+      </div>
+      <div class="link-input-row">
+        <input id="etc-url" placeholder="URL"/>
+        <input id="etc-name" placeholder="이름" style="max-width:80px"/>
+        <select id="etc-tag" style="max-width:60px">
+          <option value="유용">유용</option>
+          <option value="자료">자료</option>
+          <option value="기타">기타</option>
+        </select>
+        <button class="btn" onclick="addLink('etc')">추가</button>
+      </div>
+      <div class="link-list" id="etc-list"></div>
+    </div>
+
+    <!-- 메모 -->
+    <div class="card" data-card-id="memo">
+      <div class="card-title">
+        <span class="card-title-left">
+          <span class="drag-handle" title="드래그하여 이동">⠿</span>
+          <span class="card-title-text" ondblclick="editTitle(this,'memo')">📝 메모</span>
+          <span class="badge badge-amber">자동저장</span>
+        </span>
+        <span class="memo-saved-lbl" id="memo-saved" style="font-size:11px;color:#9ca3af"></span>
+      </div>
+      <textarea id="memo-area" placeholder="자유롭게 메모하세요..." style="width:100%;min-height:100px;border:1px solid #e8eaed;border-radius:6px;padding:10px 12px;font-size:13px;font-family:inherit;resize:vertical;outline:none;background:#f9fafb;color:#111827;line-height:1.7;transition:border-color .15s"></textarea>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── 오버레이: Sheets 설정 ── -->
+<div class="overlay" id="setup-ov">
+  <div class="dialog">
+    <h2>Google Sheets 연동</h2>
+    <p>Apps Script 웹앱 URL을 입력하면 어느 기기에서도 같은 데이터를 볼 수 있어요.</p>
+    <div class="steps">
+      <div class="step"><span><b>script.google.com</b> → 새 프로젝트 생성</span></div>
+      <div class="step"><span>받은 <b>Code.gs</b> 코드 전체 붙여넣기</span></div>
+      <div class="step"><span>배포 → 새 배포 → 유형: <b>웹 앱</b></span></div>
+      <div class="step"><span>액세스: <b>모든 사용자</b> 선택 후 배포</span></div>
+      <div class="step"><span>생성된 <b>웹 앱 URL</b> 아래 입력</span></div>
+    </div>
+    <input class="url-field" id="gs-url-input" placeholder="https://script.google.com/macros/s/.../exec"/>
+    <p style="margin-bottom:8px;margin-top:4px">Google Sheets 직접 링크 (선택 — 헤더 "시트 열기" 버튼에 사용)</p>
+    <input class="url-field" id="sheet-url-input" placeholder="https://docs.google.com/spreadsheets/d/.../edit"/>
+    <div class="dialog-btns">
+      <button class="btn-outline" onclick="closeOv('setup-ov')">취소</button>
+      <button class="btn" onclick="saveGsUrl()">연동하기</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── 오버레이: 일정 추가 (달력 클릭) ── -->
+<div class="overlay" id="ev-ov">
+  <div class="mini-dialog">
+    <h3>일정 추가</h3>
+    <div class="field"><label>날짜</label><input type="date" id="ev-date"/></div>
+    <div class="field"><label>내용</label><input id="ev-text" placeholder="예) 모의고사" onkeydown="if(event.key==='Enter')saveEv()"/></div>
+    <div class="field">
+      <label>색상</label>
+      <select id="ev-color">
+        <option value="c-blue">파랑</option>
+        <option value="c-amber">노랑</option>
+        <option value="c-green">초록</option>
+        <option value="c-purple">보라</option>
+        <option value="c-red">빨강</option>
+      </select>
+    </div>
+    <div class="mini-btns">
+      <div style="flex:1"></div>
+      <button class="btn-outline" onclick="closeOv('ev-ov')">취소</button>
+      <button class="btn" onclick="saveEv()">추가</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── 오버레이: 시간표 셀 편집 ── -->
+<div class="overlay" id="tt-ov">
+  <div class="mini-dialog">
+    <h3 id="tt-ov-title">수업 편집</h3>
+    <div class="field"><label>과목명</label><input id="tt-subj" placeholder="예) 화학Ⅱ, 실험" onkeydown="if(event.key==='Enter')saveTT()"/></div>
+    <div class="field">
+      <label>색상</label>
+      <select id="tt-color">
+        <option value="yellow">노랑</option><option value="green">초록</option>
+        <option value="purple">보라</option><option value="blue">파랑</option>
+        <option value="pink">분홍</option><option value="orange">주황</option>
+        <option value="teal">청록</option>
+      </select>
+    </div>
+    <div class="field"><label>장소 / 선생님 (선택)</label><input id="tt-room" placeholder="예) (301), 이상찬T"/></div>
+    <div class="mini-btns">
+      <button class="btn-ghost-red" id="tt-del-btn" onclick="delTTCell()">삭제</button>
+      <div style="flex:1"></div>
+      <button class="btn-outline" onclick="closeOv('tt-ov')">취소</button>
+      <button class="btn" onclick="saveTT()">저장</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ── 색상 팔레트 ── */
+const COLORS = {
+  yellow:{bg:'#fef9c3',text:'#78350f'},
+  green: {bg:'#bbf7d0',text:'#14532d'},
+  purple:{bg:'#ede9fe',text:'#4c1d95'},
+  blue:  {bg:'#bfdbfe',text:'#1e40af'},   // 301 강의실
+  pink:  {bg:'#fce7f3',text:'#831843'},
+  orange:{bg:'#fed7aa',text:'#7c2d12'},   // 306 강의실
+  teal:  {bg:'#a7f3d0',text:'#065f46'},   // 307 강의실
+};
+
+/* ── 시간표 데이터 ── */
+// 화학Ⅱ 강의실별 색상: 301=blue, 306=orange, 307=teal
+// 실험1=purple, 창체=green
+const TT_PRESET = [
+  {
+    '월-1':{subject:'화학Ⅱ',sub:'(301)',color:'blue'},
+    '화-1':{subject:'화학Ⅱ',sub:'(307)',color:'teal'},
+    '금-1':{subject:'실험1', sub:'(104)',color:'purple'},
+    '목-2':{subject:'실험1', sub:'(105)',color:'purple'},
+    '월-3':{subject:'실험1', sub:'(103)',color:'purple'},
+    '수-3':{subject:'화학Ⅱ',sub:'(306)',color:'orange'},
+    '목-3':{subject:'화학Ⅱ',sub:'(301)',color:'blue'},
+    '금-3':{subject:'실험1', sub:'(102)',color:'purple'},
+    '수-4':{subject:'화학Ⅱ',sub:'(301)',color:'blue'},
+    '금-4':{subject:'화학Ⅱ',sub:'(306)',color:'orange'},
+    '목-5':{subject:'실험1', sub:'(106)',color:'purple'},
+    '금-5':{subject:'창체',  sub:'',    color:'green'},
+    '월-6':{subject:'화학Ⅱ',sub:'(307)',color:'teal'},
+    '화-6':{subject:'실험1', sub:'(101)',color:'purple'},
+    '목-6':{subject:'화학Ⅱ',sub:'(307)',color:'teal'},
+    '금-6':{subject:'창체',  sub:'',    color:'green'},
+    '월-7':{subject:'화학Ⅱ',sub:'(306)',color:'orange'},
+  },
+  {
+    '월-1':{subject:'실험',sub:'(109) 문미슬T',color:'green'},
+    '금-1':{subject:'실험',sub:'(104) 이상찬T',color:'yellow'},
+    '화-2':{subject:'실험',sub:'(108) 이서현T',color:'purple'},
+    '목-2':{subject:'실험',sub:'(105) 이상찬T',color:'yellow'},
+    '월-3':{subject:'실험',sub:'(103) 이상찬T',color:'yellow'},
+    '금-3':{subject:'실험',sub:'(102) 이상찬T',color:'yellow'},
+    '금-4':{subject:'실험',sub:'(111) 문미슬T',color:'green'},
+    '화-5':{subject:'실험',sub:'(107) 이서현T',color:'purple'},
+    '목-5':{subject:'실험',sub:'(106) 이상찬T',color:'yellow'},
+    '화-6':{subject:'실험',sub:'(101) 이상찬T',color:'purple'},
+    '월-7':{subject:'실험',sub:'(110) 문미슬T',color:'green'},
+  }
+];
+const DAYS=['월','화','수','목','금'];
+const PERIODS=[
+  {n:1,t:'08:40'},{n:2,t:'09:40'},{n:3,t:'10:40'},
+  {n:4,t:'12:30'},{n:5,t:'13:30'},{n:6,t:'14:30'},
+  {n:7,t:'15:30'},
+];
+
+let GS_URL   = localStorage.getItem('gs_url')||'';
+let SHEET_URL= localStorage.getItem('sheet_url')||'';
+let clsLinks=[], admLinks=[], daipLinks=[], etcLinks=[], events=[];
+let userTT  = [lload('user_tt0',{}), lload('user_tt1',{})];
+let ttTarget= null, calY, calM;
+
+/* ── 시계 ── */
+function tick(){
+  const now=new Date(), p=n=>String(n).padStart(2,'0');
+  document.getElementById('clock').textContent=`${p(now.getHours())}:${p(now.getMinutes())}:${p(now.getSeconds())}`;
+  const dn=['일','월','화','수','목','금','토'];
+  document.getElementById('date-pill').textContent=`${now.getFullYear()}.${p(now.getMonth()+1)}.${p(now.getDate())} (${dn[now.getDay()]})`;
+}
+setInterval(tick,1000); tick();
+
+/* ── 동기화 ── */
+const cloud=()=>!!GS_URL;
+function setSync(s){
+  document.getElementById('sync-pill').className='sync-pill '+s;
+  document.getElementById('sync-txt').textContent={synced:'저장됨',syncing:'저장 중…',error:'연결 오류',local:'로컬 모드'}[s];
+}
+function gsSet(k,v){
+  if(!cloud())return; setSync('syncing');
+  jsonp(GS_URL+'?action=set&key='+encodeURIComponent(k)+'&value='+encodeURIComponent(v), function(d){
+    if(d&&d.ok)setSync('synced'); else setSync('error');
+  });
+}
+function jsonp(url, cb){
+  const name='__cb'+Date.now();
+  const el=document.createElement('script');
+  const t=setTimeout(()=>{cleanup();cb(null);},12000);
+  function cleanup(){
+    delete window[name];
+    clearTimeout(t);
+    if(el.parentNode)el.parentNode.removeChild(el);
+  }
+  window[name]=function(d){cleanup();cb(d);};
+  el.onerror=()=>{cleanup();cb(null);};
+  el.src=url+(url.includes('?')?'&':'?')+'callback='+name;
+  document.head.appendChild(el);
+}
+
+function loadCloud(){
+  if(!cloud())return; setSync('syncing');
+  jsonp(GS_URL+'?action=getAll', function(d){
+    if(!d||!d.ok){setSync('error');return;}
+    if(d.data.clsLinks) {clsLinks =JSON.parse(d.data.clsLinks); lsave('cls_links',clsLinks);}
+    if(d.data.admLinks) {admLinks =JSON.parse(d.data.admLinks); lsave('adm_links',admLinks);}
+    if(d.data.daipLinks){daipLinks=JSON.parse(d.data.daipLinks);lsave('daip_links',daipLinks);}
+    if(d.data.etcLinks) {etcLinks =JSON.parse(d.data.etcLinks); lsave('etc_links',etcLinks);}
+    if(d.data.events)   {events   =JSON.parse(d.data.events);   lsave('events',events);}
+    if(d.data.user_tt0) {userTT[0]=JSON.parse(d.data.user_tt0); lsave('user_tt0',userTT[0]);}
+    if(d.data.user_tt1) {userTT[1]=JSON.parse(d.data.user_tt1); lsave('user_tt1',userTT[1]);}
+    if(d.data.memo){const v=d.data.memo;lsave('memo',v);if(memoArea)memoArea.value=v;}
+    renderAll(); setSync('synced');
+  });
+}
+function lsave(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+function lload(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch{return d;}}
+
+/* ── 오버레이 ── */
+function openOv(id){document.getElementById(id).classList.add('open');}
+function closeOv(id){document.getElementById(id).classList.remove('open');}
+function saveGsUrl(){
+  GS_URL=document.getElementById('gs-url-input').value.trim();
+  SHEET_URL=document.getElementById('sheet-url-input').value.trim();
+  localStorage.setItem('gs_url',GS_URL);
+  localStorage.setItem('sheet_url',SHEET_URL);
+  updateSheetBtn();
+  closeOv('setup-ov');
+  if(GS_URL)loadCloud(); else setSync('local');
+}
+function openSheet(){ if(SHEET_URL)window.open(SHEET_URL,'_blank','noopener'); }
+function updateSheetBtn(){
+  const btn=document.getElementById('sheet-btn');
+  if(btn)btn.style.display=SHEET_URL?'':'none';
+}
+
+/* ── 달력 ── */
+function buildCal(){
+  const today=new Date(), yr=calY, mo=calM;
+  document.getElementById('cal-month').textContent=`${yr}년 ${mo+1}월`;
+  const evDays=new Set(events.filter(e=>{const d=new Date(e.date);return d.getFullYear()===yr&&d.getMonth()===mo;}).map(e=>new Date(e.date).getDate()));
+  const fd=new Date(yr,mo,1).getDay(), ld=new Date(yr,mo+1,0).getDate(), pl=new Date(yr,mo,0).getDate();
+  const DOWS=['일','월','화','수','목','금','토'];
+  let h=DOWS.map(d=>`<div class="cal-dow">${d}</div>`).join('');
+  for(let i=0;i<fd;i++){const dw=i;h+=`<div class="cal-day other${dw===0?' sun':dw===6?' sat':''}">${pl-fd+1+i}</div>`;}
+  for(let d=1;d<=ld;d++){
+    const dw=(fd+d-1)%7, isT=yr===today.getFullYear()&&mo===today.getMonth()&&d===today.getDate();
+    const dt=`${yr}-${String(mo+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const cls=['cal-day',isT?'today':'',dw===0?'sun':dw===6?'sat':'',evDays.has(d)?'has-ev':''].filter(Boolean).join(' ');
+    h+=`<div class="${cls}" onclick="openEvModal('${dt}')">${d}</div>`;
+  }
+  const rem=42-fd-ld;
+  for(let i=1;i<=rem;i++){const dw=(fd+ld-1+i)%7;h+=`<div class="cal-day other${dw===0?' sun':dw===6?' sat':''}">${i}</div>`;}
+  document.getElementById('cal-grid').innerHTML=h;
+  requestAnimationFrame(syncTTHeight);
+}
+function moveMonth(d){
+  if(d===0){const t=new Date();calY=t.getFullYear();calM=t.getMonth();}
+  else{calM+=d;if(calM>11){calM=0;calY++;}if(calM<0){calM=11;calY--;}}
+  buildCal();
+}
+function syncTTHeight(){
+  if(window.innerWidth <= 900) {
+    ['tt-card-0','tt-card-1'].forEach(id=>{
+      const el=document.getElementById(id);
+      el.style.height=''; el.style.overflow='';
+    });
+    return;
+  }
+  const h=document.getElementById('cal-card').offsetHeight;
+  ['tt-card-0','tt-card-1'].forEach(id=>{
+    const el=document.getElementById(id);
+    el.style.height=h+'px'; el.style.overflow='hidden';
+  });
+}
+
+/* ── 일정 ── */
+function openEvModal(date){
+  document.getElementById('ev-date').value=date||'';
+  document.getElementById('ev-text').value='';
+  document.getElementById('ev-color').value='c-blue';
+  openOv('ev-ov');
+  setTimeout(()=>document.getElementById('ev-text').focus(),80);
+}
+function saveEv(){
+  const date=document.getElementById('ev-date').value;
+  const text=document.getElementById('ev-text').value.trim();
+  if(!date||!text)return;
+  events.push({date,text,color:document.getElementById('ev-color').value});
+  events.sort((a,b)=>a.date.localeCompare(b.date));
+  lsave('events',events); gsSet('events',JSON.stringify(events));
+  closeOv('ev-ov'); renderEvents(); buildCal();
+}
+function quickEv(){
+  const date=document.getElementById('ev-q-date').value;
+  const text=document.getElementById('ev-q-text').value.trim();
+  if(!date||!text)return;
+  events.push({date,text,color:document.getElementById('ev-q-color').value});
+  events.sort((a,b)=>a.date.localeCompare(b.date));
+  lsave('events',events); gsSet('events',JSON.stringify(events));
+  document.getElementById('ev-q-text').value='';
+  renderEvents(); buildCal();
+}
+function delEv(i){
+  events.splice(i,1); lsave('events',events); gsSet('events',JSON.stringify(events));
+  renderEvents(); buildCal();
+}
+function renderEvents(){
+  const el=document.getElementById('ev-list');
+  if(!events.length){el.innerHTML='<div class="empty-msg">일정이 없습니다</div>';return;}
+  const today=new Date(); today.setHours(0,0,0,0);
+  el.innerHTML=events.map((e,i)=>{
+    const d=new Date(e.date); d.setHours(0,0,0,0);
+    const diff=Math.round((d-today)/86400000);
+    let diffCls,diffTxt;
+    if(diff===0){diffCls='today';diffTxt='오늘';}
+    else if(diff>0&&diff<=7){diffCls='soon';diffTxt=diff+'일 후';}
+    else if(diff>7){diffCls='future';diffTxt=diff+'일 후';}
+    else{diffCls='past';diffTxt='종료';}
+    return `<div class="ev-row ${e.color}">
+      <span class="ev-date">${e.date.slice(5)}</span>
+      <span class="ev-name">${e.text}</span>
+      <span class="ev-diff ${diffCls}">${diffTxt}</span>
+      <button class="del-x" onclick="delEv(${i})">×</button>
+    </div>`;
+  }).join('');
+}
+
+/* ── 시간표 ── */
+function merged(idx){
+  const m={};
+  Object.keys(TT_PRESET[idx]).forEach(k=>m[k]={...TT_PRESET[idx][k]});
+  Object.keys(userTT[idx]).forEach(k=>{
+    if(userTT[idx][k]===null)delete m[k];
+    else m[k]={...(m[k]||{}),...userTT[idx][k]};
+  });
+  return m;
+}
+function buildTT(idx){
+  const ti=new Date().getDay()-1, tt=merged(idx);
+  document.getElementById(`tt-head-${idx}`).innerHTML=
+    '<tr><th style="width:58px">교시</th>'+
+    DAYS.map((d,i)=>`<th class="${i===ti?'th-today':''}">${d}</th>`).join('')+'</tr>';
+  const body=document.getElementById(`tt-body-${idx}`);
+  body.innerHTML='';
+  PERIODS.forEach(({n,t})=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td class="p-col"><b style="font-size:12px;color:#6b7280">${n}</b></td>`;
+    DAYS.forEach((d,di)=>{
+      const key=`${d}-${n}`, cell=tt[key], td=document.createElement('td');
+      if(di===ti)td.classList.add('t-col');
+      if(cell){
+        const c=COLORS[cell.color]||COLORS.yellow;
+        td.innerHTML=`<div class="tt-cell" style="background:${c.bg};color:${c.text}" onclick="openTTEdit(${idx},'${d}',${n})">
+          <span class="tt-cell-name">${cell.subject}</span>
+          ${cell.sub?`<span class="tt-cell-sub">${cell.sub}</span>`:''}
+        </div>`;
+      }else{
+        td.innerHTML=`<div class="tt-cell empty" onclick="openTTEdit(${idx},'${d}',${n})"></div>`;
+      }
+      tr.appendChild(td);
+    });
+    body.appendChild(tr);
+  });
+}
+function openTTEdit(idx,day,period){
+  ttTarget={idx,day,period};
+  const cell=merged(idx)[`${day}-${period}`]||{};
+  document.getElementById('tt-ov-title').textContent=`${idx===0?'화학Ⅱ 반':'실험 반'} · ${day}요일 ${period}교시`;
+  document.getElementById('tt-subj').value =cell.subject||'';
+  document.getElementById('tt-color').value=cell.color||'yellow';
+  document.getElementById('tt-room').value =cell.sub||'';
+  document.getElementById('tt-del-btn').style.visibility=cell.subject?'visible':'hidden';
+  openOv('tt-ov');
+  setTimeout(()=>document.getElementById('tt-subj').focus(),80);
+}
+function saveTT(){
+  if(!ttTarget)return;
+  const key=`${ttTarget.day}-${ttTarget.period}`;
+  const subj=document.getElementById('tt-subj').value.trim();
+  userTT[ttTarget.idx][key]=subj
+    ?{subject:subj,color:document.getElementById('tt-color').value,sub:document.getElementById('tt-room').value.trim()}
+    :null;
+  lsave('user_tt'+ttTarget.idx,userTT[ttTarget.idx]);
+  gsSet('user_tt'+ttTarget.idx,JSON.stringify(userTT[ttTarget.idx]));
+  closeOv('tt-ov'); buildTT(ttTarget.idx);
+}
+function delTTCell(){
+  if(!ttTarget)return;
+  userTT[ttTarget.idx][`${ttTarget.day}-${ttTarget.period}`]=null;
+  lsave('user_tt'+ttTarget.idx,userTT[ttTarget.idx]);
+  gsSet('user_tt'+ttTarget.idx,JSON.stringify(userTT[ttTarget.idx]));
+  closeOv('tt-ov'); buildTT(ttTarget.idx);
+}
+
+/* ── 링크 ── */
+function getLinks(type){
+  if(type==='cls') return clsLinks;
+  if(type==='adm') return admLinks;
+  if(type==='daip')return daipLinks;
+  return etcLinks;
+}
+function renderLinks(type){
+  const list=getLinks(type);
+  const el=document.getElementById(type+'-list');
+  if(!list.length){el.innerHTML='<div class="empty-msg">링크가 없습니다</div>';return;}
+  el.innerHTML=list.map((l,i)=>`
+    <div class="link-row">
+      <span class="link-tag tag-${l.tag}">${l.tag}</span>
+      <span class="link-name" onclick="openURL('${encodeURIComponent(l.url)}')" title="${l.url}">${l.name}</span>
+      <button class="del-x" onclick="delLink('${type}',${i})">×</button>
+    </div>`).join('');
+}
+function openURL(enc){window.open(decodeURIComponent(enc),'_blank','noopener');}
+function addLink(type){
+  const uEl=document.getElementById(type+'-url');
+  const nEl=document.getElementById(type+'-name');
+  const tEl=document.getElementById(type+'-tag');
+  let url=uEl.value.trim(); if(!url)return;
+  if(!/^https?:\/\//i.test(url))url='https://'+url;
+  let name=nEl.value.trim();
+  if(!name){try{name=new URL(url).hostname;}catch{name=url;}}
+  getLinks(type).push({url,name,tag:tEl.value});
+  uEl.value=''; nEl.value='';
+  saveLinks(type); renderLinks(type);
+}
+function delLink(type,i){
+  getLinks(type).splice(i,1);
+  saveLinks(type); renderLinks(type);
+}
+function saveLinks(type){
+  const map={cls:['cls_links','clsLinks',clsLinks],adm:['adm_links','admLinks',admLinks],daip:['daip_links','daipLinks',daipLinks],etc:['etc_links','etcLinks',etcLinks]};
+  const [lk,gk,arr]=map[type]||[];
+  if(lk){lsave(lk,arr);gsSet(gk,JSON.stringify(arr));}
+}
+
+/* ── 메모 ── */
+let memoTimer;
+const memoArea = document.getElementById('memo-area');
+if(memoArea){
+  memoArea.addEventListener('focus', function(){ this.style.borderColor='#1d6bf3'; this.style.background='#fff'; });
+  memoArea.addEventListener('blur',  function(){ this.style.borderColor='#e8eaed'; this.style.background='#f9fafb'; });
+  memoArea.addEventListener('input', function(){
+    clearTimeout(memoTimer);
+    memoTimer = setTimeout(()=>{
+      const v = memoArea.value;
+      lsave('memo', v);
+      gsSet('memo', v);
+      const s = document.getElementById('memo-saved');
+      if(s){ s.textContent='저장됨'; setTimeout(()=>s.textContent='', 2000); }
+    }, 800);
+  });
+}
+
+/* ── 드래그 앤 드롭 ── */
+let dragSrc=null;
+function initDrag(){
+  const grid=document.getElementById('main-grid');
+  grid.querySelectorAll('.card').forEach(card=>{
+    card.draggable=true;
+    card.ondragstart=e=>{
+      dragSrc=card;
+      e.dataTransfer.effectAllowed='move';
+      setTimeout(()=>card.classList.add('dragging'),0);
+    };
+    card.ondragend=()=>{
+      card.classList.remove('dragging');
+      grid.querySelectorAll('.card').forEach(c=>c.classList.remove('drag-over'));
+      dragSrc=null;
+      saveCardOrder();
+    };
+    card.ondragover=e=>{ e.preventDefault(); e.dataTransfer.dropEffect='move'; };
+    card.ondragenter=e=>{ e.preventDefault(); if(card!==dragSrc)card.classList.add('drag-over'); };
+    card.ondragleave=()=>card.classList.remove('drag-over');
+    card.ondrop=e=>{
+      e.preventDefault();
+      card.classList.remove('drag-over');
+      if(dragSrc&&dragSrc!==card){
+        const cards=[...grid.querySelectorAll('.card')];
+        const si=cards.indexOf(dragSrc),di=cards.indexOf(card);
+        if(si<di)grid.insertBefore(dragSrc,card.nextSibling);
+        else grid.insertBefore(dragSrc,card);
+        saveCardOrder();
+      }
+    };
+  });
+}
+function saveCardOrder(){
+  const grid=document.getElementById('main-grid');
+  lsave('card_order',[...grid.querySelectorAll('.card')].map(c=>c.dataset.cardId));
+}
+function loadCardOrder(){
+  const order=lload('card_order',null);
+  if(!order)return;
+  const grid=document.getElementById('main-grid');
+  order.forEach(id=>{
+    const card=grid.querySelector(`[data-card-id="${id}"]`);
+    if(card)grid.appendChild(card);
+  });
+}
+
+/* ── 제목 편집 (더블클릭) ── */
+function editTitle(el,id){
+  if(el.querySelector('input'))return;
+  const orig=el.textContent;
+  const inp=document.createElement('input');
+  inp.value=orig;
+  inp.style.cssText='font-size:12px;font-weight:700;letter-spacing:.06em;border:none;outline:none;background:transparent;color:inherit;width:140px;font-family:inherit;text-transform:uppercase;';
+  el.textContent='';
+  el.appendChild(inp);
+  inp.focus();inp.select();
+  const done=()=>{
+    const v=inp.value.trim()||orig;
+    el.textContent=v;
+    const t=lload('card_titles',{});
+    t[id]=v; lsave('card_titles',t);
+  };
+  inp.addEventListener('blur',done);
+  inp.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key==='Escape')inp.blur(); });
+}
+function loadTitles(){
+  const t=lload('card_titles',{});
+  Object.entries(t).forEach(([id,v])=>{
+    const el=document.querySelector(`.card-title-text[ondblclick*="'${id}'"]`);
+    if(el)el.textContent=v;
+  });
+}
+
+/* ── 초기화 ── */
+function renderAll(){renderLinks('cls');renderLinks('adm');renderLinks('daip');renderLinks('etc');renderEvents();buildCal();buildTT(0);buildTT(1);}
+function init(){
+  const now=new Date(); calY=now.getFullYear(); calM=now.getMonth();
+  clsLinks  =lload('cls_links',[]);
+  admLinks  =lload('adm_links',[]);
+  daipLinks =lload('daip_links',[]);
+  etcLinks  =lload('etc_links',[]);
+  events    =lload('events',[]);
+  userTT[0] =lload('user_tt0',{});
+  userTT[1] =lload('user_tt1',{});
+  document.getElementById('gs-url-input').value=GS_URL;
+  document.getElementById('sheet-url-input').value=SHEET_URL;
+  updateSheetBtn();
+  const savedMemo = lload('memo','');
+  if(memoArea && savedMemo) memoArea.value = savedMemo;
+  loadCardOrder();
+  loadTitles();
+  renderAll();
+  if(GS_URL)loadCloud(); else setSync('local');
+  initDrag();
+}
+init();
+</script>
+</body>
+</html>
