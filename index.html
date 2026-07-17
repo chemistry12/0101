@@ -1680,15 +1680,17 @@ function openSusiUnivLink(name) {
   if (url) window.open(url, '_blank', 'noopener');
 }
 // 담임/3학년부가 중요하게 보는 카테고리만 축약 라벨로 그룹핑
+// (추천명단마감·서류마감·수능만 제외하고 나머지 전형 결과 카테고리는 전부 표시)
 const SUSI_PRIORITY_MAP = {
   '원서접수마감':'마감',
   '1단계합격':'1차합격',
-  '최종합격':'합격',
-  '충원합격':'추합',
-  '면접':'면접',
+  '논술':'논술',
   '실기':'실기',
+  '면접':'면접',
+  '최종합격':'최종합격',
+  '충원합격':'추합',
 };
-const SUSI_PRIORITY_ORDER = ['마감','1차합격','합격','추합','면접','실기'];
+const SUSI_PRIORITY_ORDER = ['마감','1차합격','논술','실기','면접','최종합격','추합'];
 function susiBadgeText(events) {
   const counts = {};
   events.forEach(e => {
