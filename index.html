@@ -23,6 +23,7 @@
     --color-school-bg:#eeede7; --color-school-item:#E8E6DF; --color-school-text:#444;
     --color-exam-bg:#FAECE7; --color-exam-text:#712B13;
     --color-holiday-bg:#FCEBEB; --color-holiday-text:#A32D2D;
+    --color-susi-bg:#EDE7F6; --color-susi-item:#E4DAF7; --color-susi-text:#4B2E83;
     --color-sun-bg:#fff5f5; --color-sat-bg:#f4f7ff;
     --color-dow-sun:#c0392b; --color-dow-sat:#1a5fa8;
     --color-today-border:#E24B4A; --color-today-num:#185FA5;
@@ -40,6 +41,27 @@
     margin: 0 auto;
     padding: 1.2rem 1.2rem 3rem;
   }
+
+  /* ── 최상단 고정 래퍼 (헤더+패널을 함께 화면 위에 고정) ── */
+  .top-sticky-wrap {
+    position: sticky;
+    top: 0;
+    z-index: 150;
+    background: #f0efea;
+  }
+  .panel-fold-btn {
+    background: #fff; border: 1px solid #ddd; border-radius: 6px;
+    width: 22px; height: 22px; font-size: 11px; line-height:1;
+    color: #888; cursor: pointer; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .panel-fold-btn:hover { background: #f0efeb; color:#333; }
+  .panel-title-actions { display:flex; align-items:center; gap:6px; flex-shrink:0; }
+  .panel.panel-collapsed { min-height:0; max-height:none; overflow:visible; }
+  .panel.panel-collapsed > *:not(.panel-title) { display:none; }
+  .panel.panel-collapsed #link-grid,
+  .panel.panel-collapsed #notice-list,
+  .panel.panel-collapsed #summary-list { display:none; }
 
   /* ── 최상단 헤더 ── */
   .top-header {
@@ -74,6 +96,7 @@
     grid-template-columns: 1fr 1.4fr 1fr;
     gap: 12px;
     margin-bottom: 1rem;
+    align-items: start;
   }
   .panel {
     background: #fff;
@@ -180,7 +203,7 @@
     top: 0;
     z-index: 100;
     background: #f0efea;
-    padding: 8px 0 0;
+    padding: 4px 0 0;
   }
   /* 컨트롤 바 래퍼: 컴팩트 모드 시 달력과 같은 너비·위치로 좁아짐 */
   #cal-controls-wrap {
@@ -193,37 +216,25 @@
     align-items: center;
     gap: 8px;
     flex-wrap: wrap;
-    padding: 7px 12px;
+    padding: 6px 12px;
     background: #fff;
     border: 1px solid #e0deda;
-    border-bottom: none;
+    border-radius: 10px 10px 0 0;
     margin-bottom: 0;
   }
-  .cal-controls-row1 {
-    border-radius: 10px 10px 0 0;
-    border-bottom: 1px solid #f0efeb;
-  }
-  .cal-controls-row2 {
-    border-radius: 0;
-    border-top: none;
-    border-bottom: none;
-    padding-top: 5px;
-    padding-bottom: 5px;
-    justify-content: space-between;
-  }
   .ctrl-group { display: flex; align-items: center; gap: 4px; }
-  .ctrl-divider { width: 1px; height: 20px; background: #e0deda; margin: 0 4px; }
+  .ctrl-divider { width: 1px; height: 16px; background: #e0deda; margin: 0 4px; }
 
   .zoom-btn {
     background: #f5f4f0; border: 1px solid #ddd; border-radius: 6px;
-    padding: 4px 10px; font-size: 12px;
+    padding: 3px 9px; font-size: 12px;
     font-family: 'Noto Sans KR', sans-serif; color: #333; cursor: pointer;
   }
   .zoom-btn:hover { background: #e8e6e0; }
   .zoom-value { font-size: 12px; font-weight: 700; color: #185FA5; min-width: 36px; text-align: center; }
 
   .search-input {
-    width: 180px; padding: 5px 10px;
+    width: 180px; padding: 4px 10px;
     border: 1.5px solid #ddd; border-radius: 8px;
     font-size: 13px; font-family: 'Noto Sans KR', sans-serif;
     color: #1a1a1a; outline: none;
@@ -245,7 +256,7 @@
 
   .ctrl-btn {
     background: #fff; border: 1px solid #ccc; border-radius: 6px;
-    padding: 4px 10px; font-size: 12px;
+    padding: 3px 9px; font-size: 12px;
     font-family: 'Noto Sans KR', sans-serif; color: #444; cursor: pointer;
   }
   .ctrl-btn:hover { background: #f0efeb; }
@@ -254,7 +265,7 @@
   .ctrl-spacer { flex: 1; }
   .view-tab-btn {
     background: #f5f4f0; border: 1px solid #ddd; border-radius: 6px;
-    padding: 4px 10px; font-size: 12px;
+    padding: 3px 9px; font-size: 12px;
     font-family: 'Noto Sans KR', sans-serif; color: #555; cursor: pointer;
     transition: all 0.15s;
   }
@@ -267,7 +278,7 @@
   }
   .sticky-month-row {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 6px 12px;
+    padding: 4px 12px;
     background: #fff;
     border-left: 1px solid #e0deda;
     border-right: 1px solid #e0deda;
@@ -286,7 +297,7 @@
   }
   .sticky-dow-cell {
     text-align: center; font-size: 0.8125em; font-weight: 700;
-    color: #fff; padding: 5px 0; background: #555; border-radius: 4px;
+    color: #fff; padding: 3px 0; background: #555; border-radius: 4px;
   }
   .sticky-dow-cell.sun { background: var(--color-dow-sun); }
   .sticky-dow-cell.sat { background: var(--color-dow-sat); }
@@ -364,6 +375,8 @@
   .section-school-label { font-size: 0.625em; font-weight: 700; color: var(--color-school-text); letter-spacing: 0.05em; margin-bottom: 1px; }
   .ev-school { font-size: 0.6875em; color: var(--color-school-text); background: var(--color-school-item); border-radius: 3px; padding: 2px 4px; line-height: 1.4; word-break: keep-all; }
   .ev-exam { font-size: 0.6875em; font-weight: 500; color: var(--color-exam-text); background: var(--color-exam-bg); border-radius: 3px; padding: 2px 4px; line-height: 1.4; word-break: keep-all; }
+  .section-susi { background: var(--color-susi-bg); border-radius: 4px; padding: 3px 5px; display: flex; flex-direction: column; gap: 2px; }
+  .susi-badge { font-size: 0.6875em; font-weight: 700; color: var(--color-susi-text); background: var(--color-susi-item); border-radius: 3px; padding: 2px 4px; line-height: 1.4; word-break: keep-all; }
 
   /* 플로팅 버튼 */
   .fab-wrap { position: fixed; bottom: 2rem; right: 1.5rem; display: flex; flex-direction: column; gap: 10px; z-index: 150; }
@@ -380,7 +393,7 @@
   /* 모달 */
   .overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.4); z-index:200; align-items:center; justify-content:center; padding:1rem; }
   .overlay.open { display: flex; }
-  .modal { background:#fff; border-radius:14px; padding:1.4rem; width:100%; max-width:420px; box-shadow:0 8px 32px rgba(0,0,0,0.15); max-height:90vh; overflow-y:auto; }
+  .modal { background:#fff; border-radius:14px; padding:1.4rem; width:100%; max-width:420px; box-shadow:0 8px 32px rgba(0,0,0,0.15); max-height:90vh; overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; }
   .modal-date  { font-size:12px; color:#888; margin-bottom:4px; }
   .modal-title { font-size:16px; font-weight:700; color:#1a1a1a; margin-bottom:14px; }
   .modal-section { margin-bottom:12px; }
@@ -388,6 +401,15 @@
   .modal-item        { font-size:13px; color:var(--color-g3-text); background:var(--color-g3-item); border-radius:5px; padding:5px 9px; margin-bottom:4px; line-height:1.5; white-space:pre-line; }
   .modal-item-school { font-size:12px; color:var(--color-school-text); background:var(--color-school-item); border-radius:5px; padding:4px 8px; margin-bottom:4px; line-height:1.5; white-space:pre-line; }
   .modal-item-exam   { font-size:12px; color:var(--color-exam-text); background:var(--color-exam-bg); border-radius:5px; padding:4px 8px; margin-bottom:4px; line-height:1.5; white-space:pre-line; }
+  .modal-item-susi { display:flex; flex-wrap:wrap; align-items:baseline; gap:6px; font-size:12px; color:#333; background:var(--color-susi-bg); border-radius:5px; padding:6px 9px; margin-bottom:4px; line-height:1.5; }
+  .susi-tag { font-size:10.5px; font-weight:800; color:#fff; border-radius:5px; padding:2px 6px; flex:0 0 auto; }
+  .susi-univ { font-weight:800; color:var(--color-susi-text); text-decoration:underline dotted; text-underline-offset:2px; cursor:pointer; }
+  .susi-univ:hover { color:#185FA5; }
+  .susi-type { color:#666; }
+  .susi-time { color:#185FA5; font-weight:700; font-size:11.5px; }
+  .susi-note { flex-basis:100%; color:#888; font-size:11.5px; }
+  .susi-more-btn { width:100%; margin-top:4px; padding:8px; border:1px dashed #ccc; border-radius:6px; background:#fafafa; color:#666; font-size:12px; font-weight:700; font-family:'Noto Sans KR',sans-serif; cursor:pointer; }
+  .susi-more-btn:hover { background:#f0f0f0; color:#333; }
   .modal-empty { font-size:13px; color:#aaa; }
   .close-btn { margin-top:8px; width:100%; padding:9px; background:#f5f4f0; border:none; border-radius:8px; font-family:'Noto Sans KR',sans-serif; font-size:13px; color:#555; cursor:pointer; }
   .close-btn:hover { background:#e8e6e0; }
@@ -411,6 +433,12 @@
   .g3-filter { display:flex; gap:6px; margin-bottom:12px; flex-wrap:wrap; }
   .g3-filter-btn { background:#fff; border:1px solid #ddd; border-radius:16px; padding:4px 12px; font-size:12px; font-family:'Noto Sans KR',sans-serif; color:#555; cursor:pointer; }
   .g3-filter-btn.active { background:#0F6E56; color:#fff; border-color:#0F6E56; }
+  .g3-type-btn { background:#fff; border:1px solid #ddd; border-radius:16px; padding:3px 10px; font-size:11.5px; font-family:'Noto Sans KR',sans-serif; color:#555; cursor:pointer; }
+  .g3-type-btn.active { background:#0F6E56; color:#fff; border-color:#0F6E56; }
+  .g3-more-btn { width:100%; margin-top:8px; padding:8px; border:1px dashed #ccc; border-radius:6px; background:#fafafa; color:#666; font-size:12px; font-weight:700; font-family:'Noto Sans KR',sans-serif; cursor:pointer; }
+  .g3-more-btn:hover { background:#f0f0f0; color:#333; }
+  .g3-search-input { width:100%; padding:7px 12px; margin-bottom:10px; border:1.5px solid #ddd; border-radius:8px; font-size:13px; font-family:'Noto Sans KR',sans-serif; color:#1a1a1a; outline:none; }
+  .g3-search-input:focus { border-color:#185FA5; }
   .g3-count { font-size:12px; color:#888; margin-bottom:8px; }
   .g3-item { display:flex; gap:12px; padding:10px 0; border-bottom:1px solid #f0efeb; cursor:pointer; }
   .g3-item:hover { background:#f5f4f0; border-radius:6px; padding:10px 6px; margin:0 -6px; }
@@ -420,6 +448,7 @@
   .g3-dow  { font-size:11px; color:#888; margin-top:1px; }
   .g3-content { flex:1; }
   .g3-tag  { display:inline-block; font-size:11px; font-weight:700; color:#0C447C; background:#E6F1FB; border-radius:10px; padding:2px 8px; margin-bottom:4px; }
+  .g3-tag-susi { color: var(--color-susi-text); background: var(--color-susi-item); }
   .g3-text { font-size:13px; color:#1a1a1a; line-height:1.5; }
   .g3-empty { font-size:13px; color:#aaa; text-align:center; padding:2rem 0; }
 
@@ -427,7 +456,7 @@
   @media print {
     .top-header, .top-panels, .cal-controls, .fab-wrap, .overlay,
     .sticky-month-row, .search-result-bar { display:none !important; }
-    .cal-sticky { position: static; }
+    .cal-sticky, .top-sticky-wrap { position: static; }
     .page-wrap { padding: 0; max-width: 100%; }
     .cal-body { border:none; border-radius:0; padding:0; }
     .month-block.print-hidden { display:none !important; }
@@ -537,7 +566,8 @@
     margin: 0 0 4px 0;
   }
   .compact-mode .section-g3,
-  .compact-mode .section-school { display: none; }
+  .compact-mode .section-school,
+  .compact-mode .section-susi { display: none; }
   .compact-line {
     display: flex; align-items: center; justify-content: flex-start; gap: 2px;
     font-size: 0.57em; line-height: 1.25;
@@ -553,6 +583,7 @@
   .compact-dot.g3   { background: var(--color-g3-text); }
   .compact-dot.sch  { background: var(--color-school-text); }
   .compact-dot.exam { background: var(--color-exam-text); }
+  .compact-dot.susi { background: var(--color-susi-text); }
   .compact-text { overflow: hidden; text-overflow: ellipsis; }
   .compact-more { font-size: 0.6em; color: #999; flex-shrink: 0; }
 
@@ -700,6 +731,7 @@
 
     /* 상단 패널 숨김 */
     .top-header, .top-panels { display: none; }
+    .top-sticky-wrap { position: static; }
 
     /* 컨트롤 바 완전 교체 */
     .cal-sticky { padding: 0; background: #fff; }
@@ -766,7 +798,7 @@
     }
 
     /* 모바일 일정 표시 */
-    .section-g3, .section-school { display: none !important; }
+    .section-g3, .section-school, .section-susi { display: none !important; }
     .mobile-ev {
       display: flex; align-items: center; gap: 2px;
       font-size: 10px; line-height: 1.2;
@@ -778,6 +810,7 @@
     .mobile-ev.sch  { background: var(--color-school-item); color: var(--color-school-text); }
     .mobile-ev.exam { background: var(--color-exam-bg); color: var(--color-exam-text); }
     .mobile-ev.holi { background: var(--color-holiday-bg); color: var(--color-holiday-text); }
+    .mobile-ev.susi { background: var(--color-susi-item); color: var(--color-susi-text); }
     .mobile-ev-dot {
       width: 4px; height: 4px; border-radius: 50%;
       flex-shrink: 0;
@@ -786,6 +819,7 @@
     .mobile-ev-dot.sch  { background: var(--color-school-text); }
     .mobile-ev-dot.exam { background: var(--color-exam-text); }
     .mobile-ev-dot.holi { background: var(--color-holiday-text); }
+    .mobile-ev-dot.susi { background: var(--color-susi-text); }
     .mobile-ev-text {
       overflow: hidden; text-overflow: ellipsis;
       white-space: nowrap; max-width: 100%;
@@ -904,6 +938,7 @@
 
 <div class="page-wrap">
 
+<div class="top-sticky-wrap" id="top-sticky-wrap">
   <!-- 최상단 헤더 -->
   <div class="top-header">
     <div>
@@ -921,38 +956,49 @@
   </div>
 
   <!-- 상단 3칸 패널 -->
-  <div class="top-panels">
+  <div class="top-panels" id="top-panels">
     <!-- 링크 패널 -->
-    <div class="panel">
+    <div class="panel" id="panel-link">
       <div class="panel-title">
         <span class="panel-title-left">🔗 주요 링크 바로가기</span>
-        <button class="panel-edit-btn" onclick="openLinkEditModal()">✏️ 수정</button>
+        <span class="panel-title-actions">
+          <button class="panel-fold-btn" id="link-fold-btn" onclick="togglePanel('link',this)">▴</button>
+          <button class="panel-edit-btn" onclick="openLinkEditModal()">✏️ 수정</button>
+        </span>
       </div>
       <div class="link-grid" id="link-grid">
         <span style="font-size:12px;color:#aaa;">불러오는 중...</span>
       </div>
     </div>
     <!-- 공지사항 패널 -->
-    <div class="panel">
+    <div class="panel" id="panel-notice">
       <div class="panel-title">
         <span class="panel-title-left">📢 공지사항</span>
-        <button class="panel-edit-btn" onclick="openNoticeEditModal()">✏️ 수정</button>
+        <span class="panel-title-actions">
+          <button class="panel-fold-btn" id="notice-fold-btn" onclick="togglePanel('notice',this)">▴</button>
+          <button class="panel-edit-btn" onclick="openNoticeEditModal()">✏️ 수정</button>
+        </span>
       </div>
       <div id="notice-list">
         <span class="notice-empty">불러오는 중...</span>
       </div>
     </div>
-    <!-- 3학년부 요약 패널 -->
-    <div class="panel">
+    <!-- 3학년부·수시 요약 패널 -->
+    <div class="panel" id="panel-summary">
       <div class="panel-title">
-        <span class="panel-title-left">📋 3학년부 일정 요약</span>
-        <button class="panel-edit-btn" onclick="openG3Panel()" style="background:#0F6E56;color:#fff;border-color:#0F6E56;">전체보기</button>
+        <span class="panel-title-left">📋 3학년부·수시 요약</span>
+        <span class="panel-title-actions">
+          <button class="panel-fold-btn" id="summary-fold-btn" onclick="togglePanel('summary',this)">▴</button>
+          <button class="panel-edit-btn" onclick="openG3Panel()" style="background:#0F6E56;color:#fff;border-color:#0F6E56;">전체보기</button>
+        </span>
       </div>
       <div id="summary-list">
         <span class="summary-empty">불러오는 중...</span>
       </div>
     </div>
   </div>
+</div>
+
 
   <!-- 모바일 최상단 제목 -->
   <div id="mobile-top-title" style="display:none;text-align:center;padding:12px 0 6px;font-size:16px;font-weight:700;color:#185FA5;background:#fff;border-bottom:1px solid #e8e6e0;">
@@ -1029,8 +1075,8 @@
   <div class="cal-sticky" id="cal-sticky">
     <!-- 컨트롤 바 래퍼 (컴팩트 시 달력 너비에 맞춰 좁아짐) -->
     <div id="cal-controls-wrap">
-    <!-- 1줄: 보기 필터 / 모드 / 탐색 / 페이지 이동 -->
-    <div class="cal-controls cal-controls-row1">
+    <!-- 한 줄로 병합: 보기 필터 / 모드 / 탐색 / 글씨크기 / 검색 / 바로가기 / 보조기능 -->
+    <div class="cal-controls cal-controls-single">
       <div class="ctrl-group">
         <button class="view-tab-btn active" id="view-all" onclick="setViewMode('all',this)">전체</button>
         <button class="view-tab-btn" id="view-g3" onclick="setViewMode('g3',this)">3학년부</button>
@@ -1047,14 +1093,7 @@
         <button class="view-tab-btn" id="nav-page" onclick="setNavMode('page',this)">페이지</button>
         <button class="view-tab-btn" id="nav-full" onclick="toggleFullWidth(this)" title="가로 최대화">최대화면</button>
       </div>
-      <div class="ctrl-spacer"></div>
-      <div class="ctrl-group">
-        <button class="ctrl-btn g3" onclick="openG3Panel()">📋 3학년부</button>
-        <button class="ctrl-btn" onclick="scrollToToday()" style="background:#185FA5;color:#fff;border-color:#185FA5;">오늘</button>
-      </div>
-    </div>
-    <!-- 2줄: 글씨 크기 / 검색+페이지네비(중앙) / 보조 기능 -->
-    <div class="cal-controls cal-controls-row2">
+      <div class="ctrl-divider"></div>
       <div class="ctrl-group">
         <button class="zoom-btn" ondblclick="fontReset()" onclick="fontDown()" title="더블클릭: 초기화">가−</button>
         <span class="zoom-value" id="font-value">100%</span>
@@ -1073,13 +1112,17 @@
           <button class="search-nav-btn" onclick="searchNext()">▶</button>
         </div>
       </div>
-      <div class="ctrl-spacer"></div>
       <div class="ctrl-group page-nav-inline" id="page-nav-group" style="display:none;">
         <button class="search-nav-btn" onclick="pageNav(-1)">◀</button>
         <span class="zoom-value" id="page-nav-label" style="min-width:80px;text-align:center;">2026년 3월</span>
         <button class="search-nav-btn" onclick="pageNav(1)">▶</button>
       </div>
       <div class="ctrl-spacer"></div>
+      <div class="ctrl-group">
+        <button class="ctrl-btn g3" onclick="openG3Panel()">📋 3학년부</button>
+        <button class="ctrl-btn" onclick="scrollToToday()" style="background:#185FA5;color:#fff;border-color:#185FA5;">오늘</button>
+      </div>
+      <div class="ctrl-divider"></div>
       <div class="ctrl-group">
         <button class="ctrl-btn" onclick="printCurrentMonth()">🖨 인쇄</button>
         <button class="ctrl-btn" onclick="openColorModal()">🎨 색상</button>
@@ -1168,7 +1211,7 @@
 <div class="overlay" id="g3-overlay" onclick="closeG3Panel(event)">
   <div class="modal" style="max-width:500px;max-height:85vh;overflow-y:auto;">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-      <div class="modal-title" style="margin:0;">📋 3학년부 일정 모아보기</div>
+      <div class="modal-title" style="margin:0;">📋 3학년부·수시 모아보기</div>
       <div style="display:flex;align-items:center;gap:8px;">
         <div class="popup-font-ctrl">
           <button class="popup-font-btn" onclick="popupFontChange('g3',-1)">가−</button>
@@ -1178,6 +1221,7 @@
         <button class="close-btn" style="width:auto;margin:0;padding:6px 14px;" onclick="closeG3PanelDirect()">닫기</button>
       </div>
     </div>
+    <input class="g3-search-input" id="g3-search-input" type="text" placeholder="학교명·전형명으로 검색..." oninput="setG3Search(this.value)" />
     <div id="g3-list"></div>
   </div>
 </div>
@@ -1498,6 +1542,42 @@ const MONTHS = [
 const WEEKDAYS = ["일","월","화","수","목","금","토"];
 let EVENT_MAP = {}, LINKS = [], NOTICES = [];
 let currentKey = '';
+let SUSI_MAP = {}, SUSI_CATS = [], SUSI_CAT_COLOR = {}, SUSI_UNIV_LINKS = {};
+const SUSI_URL = './susi-events.json';
+
+// ── 패널(링크/공지/요약) 접기: 셋 중 하나만 눌러도 전부 같이 접히고 펼쳐짐 ──
+const PANEL_KEYS = ['link','notice','summary'];
+function togglePanel(key, btn) {
+  const anyOpen = PANEL_KEYS.some(k => !document.getElementById('panel-'+k).classList.contains('panel-collapsed'));
+  applyPanelsCollapsed(anyOpen); // 하나라도 펼쳐져 있었으면 전부 접고, 전부 접혀 있었으면 전부 펼침
+  localStorage.setItem('panelsCollapsed', anyOpen ? '1' : '0');
+}
+function applyPanelsCollapsed(collapsed) {
+  PANEL_KEYS.forEach(key => {
+    const panel = document.getElementById('panel-'+key);
+    const btn = document.getElementById(key+'-fold-btn');
+    if (!panel || !btn) return;
+    panel.classList.toggle('panel-collapsed', collapsed);
+    btn.textContent = collapsed ? '▾' : '▴';
+  });
+  updateStickyOffsets();
+}
+function initPanelFoldStates() {
+  const saved = localStorage.getItem('panelsCollapsed');
+  const collapsed = saved === null ? true : saved === '1'; // 저장된 값 없으면 기본은 접힘
+  applyPanelsCollapsed(collapsed);
+}
+// 상단 고정 영역(top-sticky-wrap) 높이만큼 달력 컨트롤 바(cal-sticky)를 그 아래로 밀어서
+// 두 sticky 영역이 겹치지 않고 순서대로 화면 위에 쌓이도록 함
+function updateStickyOffsets() {
+  const wrap = document.getElementById('top-sticky-wrap');
+  const calSticky = document.getElementById('cal-sticky');
+  if (wrap && calSticky && !isMobile()) {
+    calSticky.style.top = wrap.offsetHeight + 'px';
+  }
+  _invalidateStickyCache();
+}
+window.addEventListener('resize', updateStickyOffsets);
 
 // ── 색상 ──────────────────────────────────────
 const DEFAULT_COLORS = {
@@ -1505,6 +1585,7 @@ const DEFAULT_COLORS = {
   '--color-school-bg':'#eeede7','--color-school-item':'#E8E6DF','--color-school-text':'#444444',
   '--color-exam-bg':'#FAECE7','--color-exam-text':'#712B13',
   '--color-holiday-bg':'#FCEBEB','--color-holiday-text':'#A32D2D',
+  '--color-susi-bg':'#EDE7F6','--color-susi-item':'#E4DAF7','--color-susi-text':'#4B2E83',
   '--color-sun-bg':'#fff5f5','--color-sat-bg':'#f4f7ff',
   '--color-dow-sun':'#c0392b','--color-dow-sat':'#1a5fa8',
   '--color-today-border':'#E24B4A','--color-today-num':'#185FA5',
@@ -1514,6 +1595,7 @@ const COLOR_LABELS = {
   '--color-school-bg':'학교일정 섹션 배경','--color-school-item':'학교일정 항목 배경','--color-school-text':'학교일정 글자색',
   '--color-exam-bg':'시험·모평 배경','--color-exam-text':'시험·모평 글자색',
   '--color-holiday-bg':'공휴일 배경','--color-holiday-text':'공휴일 글자색',
+  '--color-susi-bg':'수시 섹션 배경','--color-susi-item':'수시 항목 배경','--color-susi-text':'수시 글자색',
   '--color-sun-bg':'일요일 칸 배경','--color-sat-bg':'토요일 칸 배경',
   '--color-dow-sun':'일 요일 헤더','--color-dow-sat':'토 요일 헤더',
   '--color-today-border':'오늘 테두리','--color-today-num':'오늘 날짜 원',
@@ -1552,6 +1634,73 @@ function setStatus(state, text) {
   document.getElementById('status-text').textContent = text;
 }
 
+// ── 수시 일정 데이터 로드 (구글시트와 별개 소스) ──
+async function loadSusiData() {
+  try {
+    const res = await fetch(SUSI_URL);
+    const data = await res.json();
+    SUSI_CATS = data.cats || [];
+    SUSI_CAT_COLOR = {};
+    SUSI_CATS.forEach(c => { SUSI_CAT_COLOR[c.key] = c.color; });
+    SUSI_UNIV_LINKS = data.links || {};
+    SUSI_MAP = {};
+    (data.events || []).forEach(e => {
+      (SUSI_MAP[e.d] = SUSI_MAP[e.d] || []).push(e);
+    });
+    Object.keys(SUSI_MAP).forEach(d => {
+      SUSI_MAP[d].sort((a,b) => (a.h||'99:99').localeCompare(b.h||'99:99'));
+    });
+    refreshCalendarPreservingView();
+    renderSummary();
+    setTimeout(updateStickyOffsets, 30);
+  } catch(e) {
+    console.log('수시 일정 데이터 불러오기 실패:', e);
+  }
+}
+// buildCalendar를 다시 실행하되, 현재 화면 모드(모바일/페이지/스크롤)를 그대로 유지
+function refreshCalendarPreservingView() {
+  buildCalendar();
+  if (isMobile()) {
+    showPageMonth();
+    renderMobileEvents();
+    const lbl = document.getElementById('mobile-month-label');
+    if (lbl) lbl.textContent = MONTHS[pageIdx].label;
+  } else if (currentNavMode === 'page') {
+    showPageMonth();
+  }
+}
+function susiUnivLinkUrl(name) {
+  const key=(name||'').trim();
+  if (!key) return null;
+  if (SUSI_UNIV_LINKS[key]) return SUSI_UNIV_LINKS[key];
+  return 'https://www.google.com/search?q=' + encodeURIComponent(key + ' 입학처');
+}
+function openSusiUnivLink(name) {
+  const url = susiUnivLinkUrl(name);
+  if (url) window.open(url, '_blank', 'noopener');
+}
+// 담임/3학년부가 중요하게 보는 카테고리만 축약 라벨로 그룹핑
+const SUSI_PRIORITY_MAP = {
+  '원서접수마감':'마감',
+  '1단계합격':'1차합격',
+  '최종합격':'합격',
+  '충원합격':'추합',
+  '면접':'면접',
+  '실기':'실기',
+};
+const SUSI_PRIORITY_ORDER = ['마감','1차합격','합격','추합','면접','실기'];
+function susiBadgeText(events) {
+  const counts = {};
+  events.forEach(e => {
+    const label = SUSI_PRIORITY_MAP[e.c];
+    if (label) counts[label] = (counts[label]||0) + 1;
+  });
+  const parts = SUSI_PRIORITY_ORDER.filter(l => counts[l]).map(l => l+' '+counts[l]);
+  return parts.length
+    ? `수시 ${events.length}건 (${parts.join(', ')})`
+    : `수시 ${events.length}건`;
+}
+
 // ── 데이터 로드 ───────────────────────────────
 async function loadData() {
   setStatus('','데이터 불러오는 중...');
@@ -1581,6 +1730,7 @@ async function loadData() {
 
     // 3학년부 요약
     renderSummary();
+    setTimeout(updateStickyOffsets, 30);
 
     const now = new Date().toLocaleString('ko-KR',{timeZone:'Asia/Seoul',hour:'2-digit',minute:'2-digit'});
     setStatus('ok', now + ' 기준 최신 데이터');
@@ -1748,28 +1898,49 @@ async function toggleNoticeDone() {
 }
 
 // ── 3학년부 요약 렌더링 (전체, 앞으로 일정) ──
+function susiPrioritySummaryText(events) {
+  const counts = {};
+  events.forEach(e => {
+    const label = SUSI_PRIORITY_MAP[e.c];
+    if (label) counts[label] = (counts[label]||0) + 1;
+  });
+  return SUSI_PRIORITY_ORDER.filter(l => counts[l]).map(l => l+' '+counts[l]+'건').join(', ');
+}
 function renderSummary() {
   const today = new Date(); today.setHours(0,0,0,0);
   const list = document.getElementById('summary-list');
-  const items = Object.entries(EVENT_MAP)
+
+  const g3Items = Object.entries(EVENT_MAP)
     .filter(([k,ev]) => ev.g3 && ev.g3.trim() && new Date(k) >= today)
-    .sort((a,b) => a[0].localeCompare(b[0]));
+    .map(([k,ev]) => ({ key:k, type:'g3', lines: ev.g3.split('\n').filter(s=>s.trim()) }));
+
+  const susiItems = Object.entries(SUSI_MAP)
+    .filter(([k]) => new Date(k) >= today)
+    .map(([k,events]) => {
+      const priorityEvents = events.filter(e => SUSI_PRIORITY_MAP[e.c]);
+      if (!priorityEvents.length) return null;
+      return { key:k, type:'susi', lines:[susiPrioritySummaryText(priorityEvents)] };
+    })
+    .filter(Boolean);
+
+  const items = [...g3Items, ...susiItems].sort((a,b) => a.key.localeCompare(b.key) || (a.type==='g3'?-1:1));
+
   if (!items.length) {
-    list.innerHTML = '<span class="g3-empty">앞으로 예정된 3학년부 일정이 없습니다.</span>';
+    list.innerHTML = '<span class="g3-empty">앞으로 예정된 3학년부·수시 일정이 없습니다.</span>';
     return;
   }
-  list.innerHTML = items.map(([k,ev]) => {
-    const d = new Date(k);
-    const [y,m,day] = k.split('-');
-    const lines = ev.g3.split('\n').filter(s=>s.trim());
-    return `<div class="g3-item" onclick="jumpToDate('${k}')">
+  list.innerHTML = items.map(item => {
+    const d = new Date(item.key);
+    const [y,m,day] = item.key.split('-');
+    const isSusi = item.type === 'susi';
+    return `<div class="g3-item" onclick="jumpToDate('${item.key}')">
       <div class="g3-date-col">
         <div class="g3-date">${parseInt(m)}월 ${parseInt(day)}일</div>
         <div class="g3-dow">${y}년 ${WEEKDAYS[d.getDay()]}요일</div>
       </div>
       <div class="g3-content">
-        <span class="g3-tag">3학년부</span>
-        <div class="g3-text">${lines.join('<br>')}</div>
+        <span class="g3-tag${isSusi?' g3-tag-susi':''}">${isSusi?'수시':'3학년부'}</span>
+        <div class="g3-text">${item.lines.join('<br>')}</div>
       </div>
     </div>`;
   }).join('');
@@ -2006,7 +2177,9 @@ function doSearch(query) {
   const q = query.toLowerCase();
   cells.forEach(c => {
     const ev = EVENT_MAP[c.dataset.key]||{};
-    const text = ((ev.school||'')+' '+(ev.g3||'')).toLowerCase();
+    const susi = SUSI_MAP[c.dataset.key]||[];
+    const susiText = susi.map(e => [e.u,e.t,e.c,e.n].join(' ')).join(' ');
+    const text = ((ev.school||'')+' '+(ev.g3||'')+' '+susiText).toLowerCase();
     if (text.includes(q)) {
       c.classList.add('search-match'); c.classList.remove('search-dim','search-focus');
       searchMatches.push(c);
@@ -2106,6 +2279,30 @@ function printCurrentMonth() {
 }
 
 // ── 상세 팝업 ─────────────────────────────────
+function escapeHtml(s) {
+  return String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+let currentModalSusiEvents = [];
+function renderSusiRows(events) {
+  return events.map(e => {
+    const color = SUSI_CAT_COLOR[e.c] || '#999';
+    const univEsc = escapeHtml(e.u).replace(/'/g, "\\'");
+    return `<div class="modal-item-susi">`+
+      `<span class="susi-tag" style="background:${color}">${escapeHtml(e.c)}</span>`+
+      `<span class="susi-univ" onclick="openSusiUnivLink('${univEsc}')">${escapeHtml(e.u)}</span>`+
+      `<span class="susi-type">${escapeHtml(e.t)}</span>`+
+      (e.h?`<span class="susi-time">${escapeHtml(e.h)}</span>`:'')+
+      (e.n?`<span class="susi-note">${escapeHtml(e.n)}</span>`:'')+
+    `</div>`;
+  }).join('');
+}
+function expandSusiRows(fromIndex) {
+  const rowsEl = document.getElementById('susi-rows');
+  const btn = document.querySelector('.susi-more-btn');
+  if (!rowsEl) return;
+  rowsEl.insertAdjacentHTML('beforeend', renderSusiRows(currentModalSusiEvents.slice(fromIndex)));
+  if (btn) btn.remove();
+}
 function openDetail(k) {
   currentKey=k;
   const ev=EVENT_MAP[k]||{};
@@ -2117,16 +2314,28 @@ function openDetail(k) {
   const schoolLines=(ev.school||'').split('\n').filter(s=>s.trim());
   const examLines=schoolLines.filter(s=>isExam(s));
   const otherLines=schoolLines.filter(s=>!isExam(s));
+  const susiEvents=SUSI_MAP[k]||[];
   let html='';
   if(g3Lines.length>0){ html+='<div class="modal-section"><div class="modal-label">3학년부 일정</div>'; g3Lines.forEach(t=>{html+=`<div class="modal-item">${t}</div>`;}); html+='</div>'; }
   if(examLines.length>0){ html+='<div class="modal-section"><div class="modal-label">시험·평가</div>'; examLines.forEach(t=>{html+=`<div class="modal-item-exam">${t}</div>`;}); html+='</div>'; }
   if(otherLines.length>0){ html+='<div class="modal-section"><div class="modal-label">학교 전체 일정</div>'; otherLines.forEach(t=>{html+=`<div class="modal-item-school">${t}</div>`;}); html+='</div>'; }
+  if(susiEvents.length>0){
+    const SUSI_PAGE = 30;
+    html+='<div class="modal-section" id="susi-section"><div class="modal-label">'+escapeHtml(susiBadgeText(susiEvents))+'</div>';
+    html+='<div id="susi-rows">'+renderSusiRows(susiEvents.slice(0, SUSI_PAGE))+'</div>';
+    if(susiEvents.length > SUSI_PAGE){
+      html+=`<button class="susi-more-btn" onclick="expandSusiRows(${SUSI_PAGE})">+${susiEvents.length-SUSI_PAGE}건 더보기</button>`;
+    }
+    html+='</div>';
+  }
+  currentModalSusiEvents = susiEvents;
   if(!html) html='<div class="modal-empty">등록된 일정이 없습니다.</div>';
   document.getElementById('modal-body').innerHTML=html;
   document.getElementById('modal-footer').innerHTML=
     `<button class="edit-btn" onclick="openEditMode()">수정하기</button>`+
     `<button class="close-btn" onclick="closeModalDirect()">닫기</button>`;
   document.getElementById('overlay').classList.add('open');
+  document.body.style.overflow='hidden';
 }
 function openEditMode() {
   const ev=EVENT_MAP[currentKey]||{};
@@ -2157,7 +2366,7 @@ async function saveEdit() {
   }
 }
 function closeModal(e)     { if(e.target===document.getElementById('overlay')) closeModalDirect(); }
-function closeModalDirect(){ document.getElementById('overlay').classList.remove('open'); }
+function closeModalDirect(){ document.getElementById('overlay').classList.remove('open'); document.body.style.overflow=''; }
 
 // ── 보기/표시/탐색 모드 ──────────────────────
 let currentViewMode    = 'all';
@@ -2393,6 +2602,13 @@ function buildMonth(y,m,label) {
       schoolLines.forEach(t=>{ const el=document.createElement('div'); el.className=isExam(t)?'ev-exam':'ev-school'; el.textContent=t; sec.appendChild(el); });
       cell.appendChild(sec);
     }
+    const susiEvents=SUSI_MAP[k]||[];
+    if(susiEvents.length>0){
+      const sec=document.createElement('div'); sec.className='section-susi';
+      const badge=document.createElement('div'); badge.className='susi-badge'; badge.textContent=susiBadgeText(susiEvents);
+      sec.appendChild(badge);
+      cell.appendChild(sec);
+    }
 
     // 컴팩트 모드: 압축 표시 + 툴팁
     if (currentDisplayMode === 'compact') {
@@ -2405,6 +2621,9 @@ function buildMonth(y,m,label) {
         if (examL.length)  _addCompactOne(cell, examL, 'exam');
         if (otherL.length) _addCompactOne(cell, otherL, 'sch');
       }
+      if (susiEvents.length>0) {
+        cell.appendChild(_makeCompactRow('susi', '수시 '+susiEvents.length+'건'));
+      }
 
       // 툴팁
       const tipLines = [];
@@ -2413,6 +2632,12 @@ function buildMonth(y,m,label) {
       }
       if (schoolLines.length && currentViewMode !== 'g3') {
         tipLines.push('▶ 학교\n' + schoolLines.join('\n'));
+      }
+      if (susiEvents.length) {
+        const TIP_MAX = 15;
+        const shownS = susiEvents.slice(0, TIP_MAX).map(e=>e.u+' · '+e.c).join('\n');
+        const restS = susiEvents.length > TIP_MAX ? '\n…외 '+(susiEvents.length-TIP_MAX)+'건' : '';
+        tipLines.push('▶ 수시 (' + susiEvents.length + '건)\n' + shownS + restS);
       }
       if (tipLines.length) {
         const tipDate = new Date(y, m, d);
@@ -2474,8 +2699,11 @@ function zoomOut()   { applyZoom(currentZoom-0.1); }
 function zoomReset() { applyZoom(1); }
 window.addEventListener('wheel',(e)=>{ if(!e.ctrlKey)return; e.preventDefault(); e.deltaY<0?fontUp():fontDown(); },{passive:false});
 
-// ── 3학년부 팝업 ──────────────────────────────
+// ── 3학년부·수시 모아보기 팝업 ──────────────────
 let g3Filter='upcoming';
+let g3TypeFilter='all'; // 'all' | 'g3' | 수시 카테고리 키(원서접수마감 등)
+let g3SusiShown=60; // 카테고리별/검색 보기에서 현재까지 표시한 행 수
+let g3SearchQuery=''; // 학교명/일정 검색어
 function openG3Panel()  { renderG3List(); document.getElementById('g3-overlay').classList.add('open'); }
 function closeG3Panel(e){ if(e.target===document.getElementById('g3-overlay')) closeG3PanelDirect(); }
 function closeG3PanelDirect(){ document.getElementById('g3-overlay').classList.remove('open'); }
@@ -2484,25 +2712,132 @@ function setG3Filter(f,btn){
   document.querySelectorAll('.g3-filter-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active'); renderG3List();
 }
+function setG3TypeFilter(key,btn){
+  g3TypeFilter=key;
+  g3SusiShown=60;
+  renderG3List();
+}
+function setG3Search(v){
+  g3SearchQuery = v;
+  g3SusiShown = 60;
+  renderG3List();
+}
+function g3ExpandSusi(){
+  g3SusiShown += 60;
+  renderG3List();
+}
+function susiFullCategorySummaryText(events){
+  const counts={};
+  events.forEach(e=>{ counts[e.c]=(counts[e.c]||0)+1; });
+  const order = SUSI_CATS.length ? SUSI_CATS.map(c=>c.key) : Object.keys(counts);
+  return order.filter(c=>counts[c]).map(c=>c+' '+counts[c]+'건').join(', ');
+}
+function susiEventMatchesQuery(e, qLower){
+  return (e.u && e.u.toLowerCase().includes(qLower))
+      || (e.t && e.t.toLowerCase().includes(qLower))
+      || (e.n && e.n.toLowerCase().includes(qLower))
+      || (e.c && e.c.toLowerCase().includes(qLower));
+}
 function renderG3List() {
   const today=new Date(); today.setHours(0,0,0,0);
-  const entries=Object.entries(EVENT_MAP).filter(([k,ev])=>ev.g3&&ev.g3.trim()).sort((a,b)=>a[0].localeCompare(b[0]));
-  const filtered=entries.filter(([k])=>{ const d=new Date(k); if(g3Filter==='upcoming')return d>=today; if(g3Filter==='past')return d<today; return true; });
+  const inTimeRange = (k) => { const d=new Date(k); if(g3Filter==='upcoming')return d>=today; if(g3Filter==='past')return d<today; return true; };
+  const q = g3SearchQuery.trim();
+  const qLower = q.toLowerCase();
+
   let html=`<div class="g3-filter">
     <button class="g3-filter-btn ${g3Filter==='all'?'active':''}" onclick="setG3Filter('all',this)">전체</button>
     <button class="g3-filter-btn ${g3Filter==='upcoming'?'active':''}" onclick="setG3Filter('upcoming',this)">앞으로</button>
     <button class="g3-filter-btn ${g3Filter==='past'?'active':''}" onclick="setG3Filter('past',this)">지난 일정</button>
-  </div><div class="g3-count">총 ${filtered.length}건</div>`;
-  if(!filtered.length){ html+='<div class="g3-empty">해당하는 일정이 없습니다.</div>'; }
-  else { filtered.forEach(([k,ev])=>{
-    const d=new Date(k), dow=WEEKDAYS[d.getDay()], isPast=d<today;
-    const [y,m,day]=k.split('-');
-    const lines=ev.g3.split('\n').filter(s=>s.trim());
-    html+=`<div class="g3-item" onclick="jumpToDate('${k}')" style="${isPast?'opacity:0.5':''}">
-      <div class="g3-date-col"><div class="g3-date">${parseInt(m)}월 ${parseInt(day)}일</div><div class="g3-dow">${y}년 ${dow}요일</div></div>
-      <div class="g3-content"><span class="g3-tag">3학년부</span><div class="g3-text">${lines.join('<br>')}</div></div>
-    </div>`;
-  }); }
+  </div>
+  <div class="g3-filter">
+    <button class="g3-type-btn ${g3TypeFilter==='all'?'active':''}" onclick="setG3TypeFilter('all',this)">전체</button>
+    <button class="g3-type-btn ${g3TypeFilter==='g3'?'active':''}" onclick="setG3TypeFilter('g3',this)">3학년부</button>
+    ${SUSI_CATS.map(c=>{
+      const active = g3TypeFilter===c.key;
+      const style = active
+        ? `background:${c.color};border-color:${c.color};color:#fff;`
+        : `color:${c.color};border-color:${c.color};background:#fff;`;
+      return `<button class="g3-type-btn${active?' active':''}" onclick="setG3TypeFilter('${c.key}',this)" style="${style}">${c.key}</button>`;
+    }).join('')}
+  </div>`;
+
+  const showG3 = (g3TypeFilter==='all' || g3TypeFilter==='g3');
+  const specificCat = (g3TypeFilter!=='all' && g3TypeFilter!=='g3') ? g3TypeFilter : null;
+
+  // ── 3학년부 섹션 (전체/3학년부 필터일 때만) ──
+  let g3Html='';
+  let g3Count=0;
+  if (showG3) {
+    const g3Items = Object.entries(EVENT_MAP)
+      .filter(([k,ev]) => ev.g3 && ev.g3.trim() && inTimeRange(k))
+      .filter(([k,ev]) => !q || ev.g3.toLowerCase().includes(qLower))
+      .map(([k,ev]) => ({ key:k, lines: ev.g3.split('\n').filter(s=>s.trim()) }));
+    g3Count = g3Items.length;
+    g3Items.forEach(item => {
+      const d=new Date(item.key), dow=WEEKDAYS[d.getDay()], isPast=d<today;
+      const [y,m,day]=item.key.split('-');
+      g3Html += `<div class="g3-item" onclick="jumpToDate('${item.key}')" style="${isPast?'opacity:0.5':''}">
+        <div class="g3-date-col"><div class="g3-date">${parseInt(m)}월 ${parseInt(day)}일</div><div class="g3-dow">${y}년 ${dow}요일</div></div>
+        <div class="g3-content"><span class="g3-tag">3학년부</span><div class="g3-text">${item.lines.join('<br>')}</div></div>
+      </div>`;
+    });
+  }
+
+  // ── 수시 섹션: 카테고리 지정했거나 검색 중이면 대학별 개별 행, 아니면 날짜별 요약 ──
+  let susiHtml='';
+  let susiCount=0;
+  let susiIsAggregate=false;
+  if (g3TypeFilter!=='g3') {
+    if (!specificCat && !q) {
+      // 날짜별 요약 (기본 '전체' 모드, 검색 없음)
+      susiIsAggregate=true;
+      const susiItems = Object.entries(SUSI_MAP)
+        .filter(([k]) => inTimeRange(k))
+        .map(([k,events]) => ({ key:k, lines:[susiFullCategorySummaryText(events)] }));
+      susiCount = susiItems.length; // 날짜 수 (건수 아님)
+      susiItems.forEach(item => {
+        const d=new Date(item.key), dow=WEEKDAYS[d.getDay()], isPast=d<today;
+        const [y,m,day]=item.key.split('-');
+        susiHtml += `<div class="g3-item" onclick="jumpToDate('${item.key}')" style="${isPast?'opacity:0.5':''}">
+          <div class="g3-date-col"><div class="g3-date">${parseInt(m)}월 ${parseInt(day)}일</div><div class="g3-dow">${y}년 ${dow}요일</div></div>
+          <div class="g3-content"><span class="g3-tag g3-tag-susi">수시</span><div class="g3-text">${item.lines.join('<br>')}</div></div>
+        </div>`;
+      });
+    } else {
+      // 대학별 개별 행 (특정 카테고리 선택 또는 검색 중)
+      const rows = [];
+      Object.entries(SUSI_MAP).forEach(([k,events])=>{
+        if (!inTimeRange(k)) return;
+        events.forEach(e=>{
+          if (specificCat && e.c!==specificCat) return;
+          if (q && !susiEventMatchesQuery(e,qLower)) return;
+          rows.push({key:k, event:e});
+        });
+      });
+      rows.sort((a,b)=> a.key.localeCompare(b.key) || (a.event.h||'99:99').localeCompare(b.event.h||'99:99'));
+      susiCount = rows.length;
+      const shown = rows.slice(0, g3SusiShown);
+      shown.forEach(({key:k,event:e})=>{
+        const d=new Date(k), dow=WEEKDAYS[d.getDay()], isPast=d<today;
+        const [y,m,day]=k.split('-');
+        susiHtml += `<div class="g3-item" onclick="jumpToDate('${k}')" style="${isPast?'opacity:0.5':''}">
+          <div class="g3-date-col"><div class="g3-date">${parseInt(m)}월 ${parseInt(day)}일</div><div class="g3-dow">${y}년 ${dow}요일</div></div>
+          <div class="g3-content">${renderSusiRows([e])}</div>
+        </div>`;
+      });
+      if (rows.length > g3SusiShown) {
+        susiHtml += `<button class="g3-more-btn" onclick="g3ExpandSusi()">+${rows.length-g3SusiShown}건 더보기</button>`;
+      }
+    }
+  }
+
+  const countParts = [];
+  if (showG3) countParts.push(`3학년부 ${g3Count}건`);
+  if (g3TypeFilter!=='g3') countParts.push(susiIsAggregate ? `수시 ${susiCount}일` : `수시 ${susiCount}건`);
+  html += `<div class="g3-count">${countParts.join(' · ')}</div>`;
+  html += g3Html + susiHtml;
+  if (!g3Html && !susiHtml) html += '<div class="g3-empty">해당하는 일정이 없습니다.</div>';
+
   document.getElementById('g3-list').innerHTML=html;
 }
 function jumpToDate(k) {
@@ -2538,6 +2873,7 @@ document.addEventListener('keydown',(e)=>{
     ['link-edit-overlay','notice-edit-overlay','g3-overlay','overlay',
      'news-overlay','meal-overlay','tt-overlay','notice-popup-overlay','color-overlay']
     .forEach(id => document.getElementById(id)?.classList.remove('open'));
+    document.body.style.overflow='';
     closeToolbox();
     return;
   }
@@ -2597,10 +2933,9 @@ function toggleFullWidth(btn) {
     s.id = 'full-width-override';
     s.textContent = `
       .page-wrap { max-width: 100% !important; padding: 0.5rem 0.4rem 3rem !important; }
-      #cal-zoom-wrap { max-width: 100% !important; }
-      #cal-zoom-wrap-header { max-width: 100% !important; }
     `;
     document.head.appendChild(s);
+    applyLayout(); // 컴팩트 모드면 50%, 전체 모드면 100%로 현재 표시 모드에 맞게 재적용
   } else {
     document.getElementById('full-width-override')?.remove();
     applyLayout();
@@ -2779,6 +3114,10 @@ function renderMobileEvents() {
     if (currentViewMode !== 'g3') {
       examLines.forEach(t => items.push({text:t, cls:'exam'}));
       otherLines.forEach(t => items.push({text:t, cls:'sch'}));
+    }
+    const susiEvents = SUSI_MAP[k] || [];
+    if (susiEvents.length > 0) {
+      items.push({text:'수시 '+susiEvents.length+'건', cls:'susi'});
     }
 
     const shown = items.slice(0, MAX_ITEMS);
@@ -3350,8 +3689,9 @@ function loadSettings() {
       if (btn) { btn.classList.add('active'); btn.textContent = '원래화면'; btn.title = '원래 너비로'; }
       const st = document.createElement('style');
       st.id = 'full-width-override';
-      st.textContent = `.page-wrap { max-width: 100% !important; padding: 0.5rem 0.4rem 3rem !important; } #cal-zoom-wrap { max-width: 100% !important; } #cal-zoom-wrap-header { max-width: 100% !important; }`;
+      st.textContent = `.page-wrap { max-width: 100% !important; padding: 0.5rem 0.4rem 3rem !important; }`;
       document.head.appendChild(st);
+      applyLayout(); // 컴팩트 모드면 50%, 전체 모드면 100%로 현재 표시 모드에 맞게 재적용
     }
 
   } catch(e) { console.log('설정 복원 오류:', e); }
@@ -3359,7 +3699,9 @@ function loadSettings() {
 
 loadColors();
 applyZoom(currentZoom);
+initPanelFoldStates();
 loadData();
+loadSusiData();
 
 // ── PWA Service Worker 등록 ──────────────────
 if ('serviceWorker' in navigator) {
