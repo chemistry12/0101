@@ -409,6 +409,8 @@
   .modal-item-susi { display:flex; flex-wrap:wrap; align-items:baseline; gap:6px; font-size:12px; color:#333; background:var(--color-susi-bg); border-radius:5px; padding:6px 9px; margin-bottom:4px; line-height:1.5; }
   .susi-tag { font-size:10.5px; font-weight:800; color:#fff; border-radius:5px; padding:2px 6px; flex:0 0 auto; }
   .susi-univ { font-weight:800; color:var(--color-susi-text); text-decoration:underline dotted; text-underline-offset:2px; cursor:pointer; }
+  .susi-link-edit-btn { background:none; border:none; font-size:11px; cursor:pointer; padding:0 2px; opacity:0.5; flex-shrink:0; }
+  .susi-link-edit-btn:hover { opacity:1; }
   .susi-univ:hover { color:#185FA5; }
   .susi-type { color:#666; }
   .susi-time { color:#185FA5; font-weight:700; font-size:11.5px; }
@@ -952,6 +954,7 @@
     </div>
     <div class="status-bar">
       <button class="refresh-btn" onclick="openToolbox()" style="background:none;border-color:transparent;color:#aaa;font-size:16px;padding:4px 8px;">🎲</button>
+      <a href="https://docs.google.com/spreadsheets/d/1mxmSepuTgp2JCeHzwoXPFg1paanMPXFVVwGx64QxqSY/edit?usp=sharing" target="_blank" rel="noopener" class="refresh-btn" title="수시 일정 원본 구글시트 열기 (날짜·시간 수정용)" style="background:#f3edff;border-color:#c4b5fd;color:#6d28d9;text-decoration:none;">📊 수시 시트</a>
       <a href="https://myys-h.goesw.kr/myys-h/na/ntt/selectNttList.do?mi=17174&bbsId=10012" target="_blank" rel="noopener" class="refresh-btn" style="background:#f0f7f0;border-color:#639922;color:#2d5a0e;text-decoration:none;">📄 가정통신문</a>
       <button class="refresh-btn" onclick="openMealPopup()" style="background:#fff7e6;border-color:#EF9F27;color:#854F0B;">🍱 급식정보</button>
       <button class="refresh-btn" onclick="openTTPopup()" style="background:#e6f1fb;border-color:#85B7EB;color:#0C447C;">📅 시간표</button>
@@ -1126,6 +1129,12 @@
         <span class="zoom-value" id="page-nav-label" style="min-width:80px;text-align:center;">2026년 3월</span>
         <button class="search-nav-btn" onclick="pageNav(1)">▶</button>
       </div>
+      <div class="ctrl-divider"></div>
+      <div class="ctrl-group">
+        <select id="susi-cat-filter" class="ctrl-btn" onchange="setSusiCatFilter(this.value)" title="달력에 특정 수시 카테고리만 표시">
+          <option value="">수시: 전체</option>
+        </select>
+      </div>
       <div class="ctrl-spacer"></div>
       <div class="ctrl-group">
         <button class="ctrl-btn g3" onclick="openG3Panel()">📋 3학년부</button>
@@ -1213,6 +1222,20 @@
     </div>
     <div class="save-error" id="notice-edit-error"></div>
     <button class="close-btn" onclick="closeNoticeEditModal()">닫기</button>
+  </div>
+</div>
+
+<!-- 수시 대학 링크 수정 팝업 -->
+<div class="overlay" id="link-quick-edit-overlay" onclick="closeLinkEditPrompt(event)" style="z-index:260;">
+  <div class="modal" style="max-width:380px;">
+    <div class="modal-title" style="margin:0 0 12px;">🔗 입학처 링크 수정</div>
+    <div style="font-size:13px;color:#666;margin-bottom:6px;" id="link-edit-univ-name"></div>
+    <input type="text" id="link-edit-input" class="g3-search-input" style="margin-bottom:4px;" placeholder="https://..." />
+    <div id="link-edit-status" style="font-size:12px;color:#E24B4A;min-height:16px;margin-bottom:8px;"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;">
+      <button class="close-btn" style="width:auto;margin:0;padding:6px 14px;background:#fff;color:#444;border:1px solid #ccc;" onclick="closeLinkEditPrompt()">취소</button>
+      <button class="edit-btn" style="width:auto;margin:0;padding:6px 14px;" id="link-edit-save-btn" onclick="saveSusiLink()">저장</button>
+    </div>
   </div>
 </div>
 
@@ -1553,7 +1576,7 @@ const WEEKDAYS = ["일","월","화","수","목","금","토"];
 let EVENT_MAP = {}, LINKS = [], NOTICES = [];
 let currentKey = '';
 let SUSI_MAP = {}, SUSI_CATS = [], SUSI_CAT_COLOR = {}, SUSI_UNIV_LINKS = {};
-const SUSI_URL = './susi-events.json';
+const SUSI_URL = 'https://script.google.com/macros/s/AKfycbywRbR1XuIydRqav4p9gR2-zNbe3HyhFjVhP_z2e0oh9DvmaEm6H6FGIHWBr9z1nPRl/exec';
 
 // ── 패널(링크/공지/요약) 접기: 셋 중 하나만 눌러도 전부 같이 접히고 펼쳐짐 ──
 const PANEL_KEYS = ['link','notice','summary'];
@@ -1645,14 +1668,33 @@ function setStatus(state, text) {
 }
 
 // ── 수시 일정 데이터 로드 (구글시트와 별개 소스) ──
+// ── 달력 전체를 특정 수시 카테고리만 걸러서 보기 ──
+let susiCatFilter = '';
+function populateSusiCatFilterOptions() {
+  const sel = document.getElementById('susi-cat-filter');
+  if (!sel) return;
+  const prev = sel.value;
+  sel.innerHTML = '<option value="">수시: 전체</option>' +
+    SUSI_CATS.map(c => `<option value="${escapeHtml(c.key)}">수시: ${escapeHtml(c.key)}</option>`).join('');
+  if (SUSI_CATS.some(c => c.key === prev)) sel.value = prev;
+}
+function setSusiCatFilter(val) {
+  susiCatFilter = val;
+  refreshCalendarPreservingView();
+}
+function getCellSusiEvents(k) {
+  const all = SUSI_MAP[k] || [];
+  return susiCatFilter ? all.filter(e => e.c === susiCatFilter) : all;
+}
 async function loadSusiData() {
   try {
-    const res = await fetch(SUSI_URL);
+    const res = await fetch(SUSI_URL + (SUSI_URL.includes('?')?'&':'?') + '_t=' + Date.now(), { cache: 'no-store' });
     const data = await res.json();
     SUSI_CATS = data.cats || [];
     SUSI_CAT_COLOR = {};
     SUSI_CATS.forEach(c => { SUSI_CAT_COLOR[c.key] = c.color; });
     SUSI_UNIV_LINKS = data.links || {};
+    populateSusiCatFilterOptions();
     SUSI_MAP = {};
     (data.events || []).forEach(e => {
       (SUSI_MAP[e.d] = SUSI_MAP[e.d] || []).push(e);
@@ -1688,6 +1730,44 @@ function susiUnivLinkUrl(name) {
 function openSusiUnivLink(name) {
   const url = susiUnivLinkUrl(name);
   if (url) window.open(url, '_blank', 'noopener');
+}
+// ── 대학 링크 수정 ────────────────────────────
+let _linkEditTargetUniv = '';
+function openLinkEditPrompt(univName) {
+  _linkEditTargetUniv = univName;
+  document.getElementById('link-edit-univ-name').textContent = univName + '의 입학처 링크';
+  document.getElementById('link-edit-input').value = SUSI_UNIV_LINKS[univName] || '';
+  document.getElementById('link-edit-status').textContent = '';
+  const btn = document.getElementById('link-edit-save-btn');
+  btn.disabled = false; btn.textContent = '저장';
+  document.getElementById('link-quick-edit-overlay').classList.add('open');
+  setTimeout(() => document.getElementById('link-edit-input').focus(), 50);
+}
+function closeLinkEditPrompt(e) {
+  if (e && e.target !== document.getElementById('link-quick-edit-overlay')) return;
+  document.getElementById('link-quick-edit-overlay').classList.remove('open');
+}
+async function saveSusiLink() {
+  const link = document.getElementById('link-edit-input').value.trim();
+  const statusEl = document.getElementById('link-edit-status');
+  const btn = document.getElementById('link-edit-save-btn');
+  if (!link) { statusEl.textContent = '링크를 입력해주세요.'; statusEl.style.color = '#E24B4A'; return; }
+  if (!/^https?:\/\//.test(link)) { statusEl.textContent = 'http:// 또는 https:// 로 시작해야 해요.'; statusEl.style.color = '#E24B4A'; return; }
+  btn.disabled = true; btn.textContent = '저장 중...';
+  statusEl.textContent = '';
+  try {
+    const res = await fetch(SUSI_URL, { method:'POST', body: JSON.stringify({ action:'updateLink', university:_linkEditTargetUniv, link }) });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error || '저장 실패');
+    SUSI_UNIV_LINKS[_linkEditTargetUniv] = link; // 새로고침 없이 바로 반영
+    statusEl.style.color = '#639922';
+    statusEl.textContent = '저장 완료!';
+    setTimeout(() => { document.getElementById('link-quick-edit-overlay').classList.remove('open'); }, 600);
+  } catch(err) {
+    statusEl.style.color = '#E24B4A';
+    statusEl.textContent = '저장 실패: 잠시 후 다시 시도해주세요.';
+    btn.disabled = false; btn.textContent = '저장';
+  }
 }
 // 담임/3학년부가 중요하게 보는 카테고리만 축약 라벨로 그룹핑
 // (추천명단마감·서류마감·수능만 제외하고 나머지 전형 결과 카테고리는 전부 표시)
@@ -2312,6 +2392,7 @@ function renderSusiRows(events) {
     return `<div class="modal-item-susi">`+
       `<span class="susi-tag" style="background:${color}">${escapeHtml(e.c)}</span>`+
       `<span class="susi-univ" onclick="openSusiUnivLink('${univEsc}')">${escapeHtml(e.u)}</span>`+
+      `<button class="susi-link-edit-btn" title="입학처 링크 수정" onclick="event.stopPropagation(); openLinkEditPrompt('${univEsc}')">✏️</button>`+
       `<span class="susi-type">${escapeHtml(e.t)}</span>`+
       (e.h?`<span class="susi-time">${escapeHtml(e.h)}</span>`:'')+
       (e.n?`<span class="susi-note">${escapeHtml(e.n)}</span>`:'')+
@@ -2347,7 +2428,7 @@ function openDetail(k) {
   const schoolLines=(ev.school||'').split('\n').filter(s=>s.trim());
   const examLines=schoolLines.filter(s=>isExam(s));
   const otherLines=schoolLines.filter(s=>!isExam(s));
-  const susiEvents=SUSI_MAP[k]||[];
+  const susiEvents=getCellSusiEvents(k);
   let html='';
   if(g3Lines.length>0){ html+='<div class="modal-section"><div class="modal-label">3학년부 일정</div>'; g3Lines.forEach(t=>{html+=`<div class="modal-item">${t}</div>`;}); html+='</div>'; }
   if(examLines.length>0){ html+='<div class="modal-section"><div class="modal-label">시험·평가</div>'; examLines.forEach(t=>{html+=`<div class="modal-item-exam">${t}</div>`;}); html+='</div>'; }
@@ -2639,7 +2720,7 @@ function buildMonth(y,m,label) {
       schoolLines.forEach(t=>{ const el=document.createElement('div'); el.className=isExam(t)?'ev-exam':'ev-school'; el.textContent=t; sec.appendChild(el); });
       cell.appendChild(sec);
     }
-    const susiEvents=SUSI_MAP[k]||[];
+    const susiEvents=getCellSusiEvents(k);
     if(susiEvents.length>0){
       const sec=document.createElement('div'); sec.className='section-susi';
       const badge=document.createElement('div'); badge.className='susi-badge'; badge.textContent=susiBadgeText(susiEvents);
@@ -3004,7 +3085,7 @@ document.addEventListener('keydown',(e)=>{
   // Esc → 열린 팝업 모두 닫기
   if(e.key==='Escape'){
     ['link-edit-overlay','notice-edit-overlay','g3-overlay','overlay',
-     'news-overlay','meal-overlay','tt-overlay','notice-popup-overlay','color-overlay']
+     'news-overlay','meal-overlay','tt-overlay','notice-popup-overlay','color-overlay','link-quick-edit-overlay']
     .forEach(id => document.getElementById(id)?.classList.remove('open'));
     document.body.style.overflow='';
     closeToolbox();
@@ -3264,9 +3345,9 @@ function renderMobileEvents() {
       examLines.forEach(t => items.push({text:t, cls:'exam'}));
       otherLines.forEach(t => items.push({text:t, cls:'sch'}));
     }
-    const susiEvents = SUSI_MAP[k] || [];
+    const susiEvents = getCellSusiEvents(k);
     if (susiEvents.length > 0) {
-      items.push({text:'수시 '+susiEvents.length+'건', cls:'susi'});
+      items.push({text:(susiCatFilter||'수시')+' '+susiEvents.length+'건', cls:'susi'});
     }
 
     const shown = items.slice(0, MAX_ITEMS);
